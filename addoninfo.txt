@@ -1,0 +1,9 @@
+"AddonInfo"
+{
+	addonSteamAppID "550"
+	addontitle "Versus++"
+	addonversion "1"
+	addonauthor "Failzz, Derpduck"
+	addonauthorSteamID "LEAVE THIS BLANK"
+	addonDescription "Versus but improved"
+}
