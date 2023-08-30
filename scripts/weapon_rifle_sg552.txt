@@ -60,7 +60,7 @@ WeaponData
 	"PenetrationMaxDistance"	"0"	// none
 
 	"Damage"			"33"
-	"Range"				"4500"
+	"Range"				"4000"
 	"RangeModifier"			"0.97"
 	"GainRange"			"1500"	// range at which to use a gain curve to fall off to zero
 	"Bullets"			"1"

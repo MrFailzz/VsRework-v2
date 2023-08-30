@@ -3,29 +3,25 @@ Msg("Beginning crane panic event.\n")
 DirectorOptions <-
 {
 	ProhibitBosses = true
-	CommonLimit = 20
 
 	MobSpawnMinTime = 3
-	MobSpawnMaxTime = 3
-	MobMinSize = 15
-	MobMaxSize = 20
+	MobSpawnMaxTime = 7
+	MobMinSize = 10
+	MobMaxSize = 30
 	MobMaxPending = 25
-	SustainPeakMinTime = 10
-	SustainPeakMaxTime = 15
-	IntensityRelaxThreshold = 0.99
-	RelaxMinInterval = 3
-	RelaxMaxInterval = 5
-	RelaxMaxFlowTravel = 200
+	MobRechargeRate = 0.025
+	SustainPeakMinTime = 3
+	SustainPeakMaxTime = 5
+	IntensityRelaxThreshold = 1.1
+	RelaxMinInterval = 5
+	RelaxMaxInterval = 7
+	RelaxMaxFlowTravel = 300
 	BoomerLimit = 0
 	SmokerLimit = 1
 	HunterLimit = 1
 	ChargerLimit = 1
-	SpecialRespawnInterval = 5.0
-	PreferredMobDirection = SPAWN_IN_FRONT_OF_SURVIVORS
+	SpecialRespawnInterval = 10.0
+	PreferredMobDirection = SPAWN_ANYWHERE
 }
 
-if ( Director.GetGameModeBase() == "versus" )
-{
-    DirectorOptions.MobSpawnMinTime = 5;
-    DirectorOptions.MobSpawnMaxTime = 5;
-}
+Director.ResetMobTimer()

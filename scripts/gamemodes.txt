@@ -104,6 +104,7 @@
 			"360_z_versus_wandering_density" 0.026
 
 			// New Tweaks
+			"upgrade_laser_sight_spread_factor" 0.6
 			"z_max_survivor_damage" 100
 			"z_jockey_control_variance" 0
 			"z_jockey_control_min" 0.68
