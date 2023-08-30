@@ -1,9 +1,9 @@
 Msg("c14m1_junkyard script\n");
 
-// Fuel lever to start junkyard event
+// Fuel button to start junkyard event
 local fuel_button = Entities.FindByName( null, "fuel_button" );
 
-// Function to replace panic event input with new scripts
+// Function to replace panic event inputs with new scripts
 function Junkyard_Rework()
 {
     if ( fuel_button )
@@ -14,5 +14,5 @@ function Junkyard_Rework()
     }
 }
 
-// Run function to change event
+// Run function
 Junkyard_Rework();

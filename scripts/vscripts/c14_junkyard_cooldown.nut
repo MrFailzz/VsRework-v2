@@ -8,13 +8,13 @@ DirectorOptions <-
 	MobSpawnMaxTime = 35
 	MobMinSize = 10
 	MobMaxSize = 25
-	MobMaxPending = 10
+	MobMaxPending = 25
 	SustainPeakMinTime = 5
 	SustainPeakMaxTime = 8
 	IntensityRelaxThreshold = 0.9
 	RelaxMinInterval = 10
 	RelaxMaxInterval = 15
-	RelaxMaxFlowTravel = 1000	
+	RelaxMaxFlowTravel = 800	
 	BoomerLimit = 1
 	SpitterLimit = 1
 	SmokerLimit = 2
@@ -22,8 +22,7 @@ DirectorOptions <-
 	ChargerLimit = 1
 	SpecialRespawnInterval = 45.0
 	PreferredMobDirection = SPAWN_ANYWHERE
+	ZombieSpawnRange = 2000
 }
 
 Director.ResetMobTimer()
-
-//EntFire( "drop_button","AddOutput","OnPressed director:RunScriptCode:c14m1_junkyard_end():4:-1");
