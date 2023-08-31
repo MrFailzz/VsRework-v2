@@ -4,6 +4,14 @@ Msg("VERSUS++\n");
 Convars.SetValue("ammo_minigun_max", 20);
 
 // Scoring Tweaks
+// Survivor Bonus
+Convars.SetValue("vs_survival_bonus", 25)
+survivorBonus <- 25
+
+function OnGameEvent_heal_success(params)
+	Convars.SetValue("vs_survival_bonus", survivorBonus - 2);
+
+// Tiebreaker
 if (Director.GetMapNumber() == 0)
 	Convars.SetValue("vs_tiebreak_bonus", 40);
 
