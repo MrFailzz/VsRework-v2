@@ -45,7 +45,7 @@ function AllowTakeDamage(damageTable)
 	local damageType = damageTable.DamageType;
 
 	//Modifiers
-	local damageModifier = 0.85;
+	local damageModifier = 0.90;
 
 	//Modify Attacker damage
 	if (attacker.IsValid())
@@ -121,50 +121,35 @@ function OnGameEvent_molotov_thrown(params)
 }
 
 
-function OnGameEvent_player_left_safe_area(params)
+function OnGameEvent_round_start(params)
 {
-	local ItemstoRemove_ModelPaths =
-	[
-		"models/w_models/weapons/w_sniper_awp.mdl",
-	];
+	local weapon_awp = null;
+	local weapon_launcher = null;
 
-	// Remove regular AWP spawn
-	foreach(modelpath in ItemstoRemove_ModelPaths)
-	{
-		local weapon_ent = null;
-		while(weapon_ent = Entities.FindByModel(weapon_ent, modelpath))
-		    weapon_ent.Kill();                
-	}
+	// Remove AWP spawns
+	while(weapon_awp = Entities.FindByModel(weapon_awp, "models/w_models/weapons/w_sniper_awp.mdl"))
+		weapon_awp.Kill();                
 
-	local ItemstoRemove_ModelPaths =
-	[
-        "models/w_models/weapons/w_grenade_launcher.mdl",
-	];
+	// Replace grenade launcher with AWP
+	while(weapon_launcher = Entities.FindByModel(weapon_launcher, "models/w_models/weapons/w_grenade_launcher.mdl"))
+    {
+		local weapon_originX = weapon_launcher.GetOrigin().x;
+        local weapon_originY = weapon_launcher.GetOrigin().y;
+	    local weapon_originZ = weapon_launcher.GetOrigin().z;
+	    local weapon_angleX = weapon_launcher.GetAngles().x;
+	    local weapon_angleY = weapon_launcher.GetAngles().y;
+	    local weaponName = "AWP_spawn";
+	    local weaponSpawn = SpawnEntityFromTable("weapon_sniper_awp",
+	    {
+		    targetname = weaponName,
+		    origin = Vector(weapon_originX, weapon_originY, weapon_originZ),
+		    angles = Vector(weapon_angleX, weapon_angleY, 0)
+		    solid = 0,
+		    disableshadows = 1,
+            ammo = 20,
+	    });
 
-	// Spawn AWP in T3 place
-	foreach(modelpath in ItemstoRemove_ModelPaths)
-	{
-		local weapon_ent = null;
-		while(weapon_ent = Entities.FindByModel(weapon_ent, modelpath))
-            {
-				// Create AWP
-		    	local weapon_originX = weapon_ent.GetOrigin().x;
-                local weapon_originY = weapon_ent.GetOrigin().y;
-	            local weapon_originZ = weapon_ent.GetOrigin().z;
-	            local weapon_angleX = weapon_ent.GetAngles().x;
-	            local weapon_angleY = weapon_ent.GetAngles().y;
-	            local weaponName = "AWP_spawn";
-	            local weaponSpawn = SpawnEntityFromTable("weapon_sniper_awp",
-	            {
-		            targetname = weaponName,
-		            origin = Vector(weapon_originX, weapon_originY, weapon_originZ),
-		            angles = Vector(weapon_angleX, weapon_angleY, 0)
-		            solid = 0,
-		            disableshadows = 1,
-                    ammo = 20,
-	            });
-
-		    	weapon_ent.Kill();                
-            }
-	}
+		// Remove grenade launcher spawns
+		weapon_launcher.Kill();                
+    }
 }
