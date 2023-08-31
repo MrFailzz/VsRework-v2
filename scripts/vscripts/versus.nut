@@ -4,14 +4,19 @@ Msg("VERSUS++\n");
 Convars.SetValue("ammo_minigun_max", 20);
 
 // Scoring Tweaks
-// Survivor Bonus
 Convars.SetValue("vs_survival_bonus", 25)
+Convars.SetValue("vs_defib_penalty", 0)
 survivorBonus <- 25
 
+// Reduce bonus when medkits used
 function OnGameEvent_heal_success(params)
-	Convars.SetValue("vs_survival_bonus", survivorBonus - 2);
+	Convars.SetValue("vs_survival_bonus", survivorBonus - 1);
 
-// Tiebreaker
+// Reduce bonus when defibs used
+function OnGameEvent_defibrillator_used(params)
+	Convars.SetValue("vs_survival_bonus", survivorBonus - 5);
+
+// Scale tiebreaker alongside distance points
 if (Director.GetMapNumber() == 0)
 	Convars.SetValue("vs_tiebreak_bonus", 40);
 
