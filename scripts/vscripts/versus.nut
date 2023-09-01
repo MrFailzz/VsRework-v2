@@ -1,8 +1,5 @@
 Msg("VERSUS++\n");
 
-// AWP Tweaks
-Convars.SetValue("ammo_minigun_max", 20);
-
 // Scoring Tweaks
 Convars.SetValue("vs_survival_bonus", 25)
 Convars.SetValue("vs_defib_penalty", 0)
@@ -10,13 +7,27 @@ survivorBonus <- 25
 
 // Reduce bonus when medkits used
 function OnGameEvent_heal_success(params)
+{
 	Convars.SetValue("vs_survival_bonus", survivorBonus - 1);
+	survivorBonus -= 1;
+
+	// Do not let survival bonus go below 0
+	if (Convars.GetFloat("vs_survival_bonus") < 0)
+		Convars.SetValue("vs_survival_bonus", 0);
+}
 
 // Reduce bonus when defibs used
 function OnGameEvent_defibrillator_used(params)
+{
 	Convars.SetValue("vs_survival_bonus", survivorBonus - 5);
+	survivorBonus -= 5;
+	
+	// Do not let survival bonus go below 0
+	if (Convars.GetFloat("vs_survival_bonus") < 0)
+		Convars.SetValue("vs_survival_bonus", 0);
+}
 
-// Scale tiebreaker alongside distance points
+// Scale tiebreaker w/ distance pts
 if (Director.GetMapNumber() == 0)
 	Convars.SetValue("vs_tiebreak_bonus", 40);
 
@@ -133,7 +144,11 @@ function OnGameEvent_molotov_thrown(params)
 	}
 }
 
+// AWP Tweaks
+// Reserve Ammo
+Convars.SetValue("ammo_minigun_max", 20);
 
+// Spawns
 function OnGameEvent_round_start(params)
 {
 	local weapon_awp = null;
