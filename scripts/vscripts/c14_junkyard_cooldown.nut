@@ -8,7 +8,7 @@ DirectorOptions <-
 	MobSpawnMaxTime = 35
 	MobMinSize = 10
 	MobMaxSize = 25
-	MobMaxPending = 25
+	MobMaxPending = 50
 	SustainPeakMinTime = 5
 	SustainPeakMaxTime = 8
 	IntensityRelaxThreshold = 0.9
@@ -22,7 +22,6 @@ DirectorOptions <-
 	ChargerLimit = 1
 	SpecialRespawnInterval = 45.0
 	PreferredMobDirection = SPAWN_ANYWHERE
-	ZombieSpawnRange = 2000
 }
 
 Director.ResetMobTimer()
