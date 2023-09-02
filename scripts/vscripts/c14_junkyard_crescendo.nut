@@ -4,8 +4,8 @@ DirectorOptions <-
 {
 	ProhibitBosses = true
 
-	MobSpawnMinTime = 1
-	MobSpawnMaxTime = 1
+	MobSpawnMinTime = 20
+	MobSpawnMaxTime = 20
 	MobMinSize = 80
 	MobMaxSize = 80
 	MobMaxPending = 50

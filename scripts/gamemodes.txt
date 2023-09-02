@@ -109,8 +109,8 @@
 			"z_jockey_control_variance" 0
 			"z_jockey_control_min" 0.68
 			"z_jockey_control_max" 0.68
-			"versus_tank_flow_team_variation" 0
-			"versus_witch_flow_team_variation" 0
+			"versus_tank_flow_team_variation" 0.00
+			"versus_witch_flow_team_variation" 0.00
 			"z_tank_damage_slow_min_range" -600
 			"tank_burn_duration" 90
 			"z_witch_damage_per_kill_hit" 20
