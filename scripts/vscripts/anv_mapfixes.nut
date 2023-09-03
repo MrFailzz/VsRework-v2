@@ -4605,11 +4605,14 @@ con_comment( "CVAR:\tSet \"director_convert_pills\" to 0 to prevent excess defib
 
 Convars.SetValue( "director_convert_pills", 0 );
 
-EntFire( "car_alarm_prop", "Kill", null, 0 );
-EntFire( "car_alarm_event", "Kill", null, 0 );
-make_prop( "physics", "_replace_alarm_car", "models/props_vehicles/cara_95sedan.mdl", "-1584 -2480 -15", "0 219 0", "shadow_no", "solid_yes", "138 37 9" );
-make_prop( "dynamic", "_replace_alarm_car_glass", "models/props_vehicles/cara_95sedan_glass.mdl", "-1584 -2480 -15", "0 219 0", "shadow_no" );
-EntFire( g_UpdateName + "_replace_alarm_car_glass",	"SetParent", g_UpdateName + "_replace_alarm_car", 0 );
+EntFire( "car_alarm_prop", "AddOutput", "origin -1584 -2480 -15", 1 );
+EntFire( "car_alarm_prop", "AddOutput", "angles 0 219 0", 1 );
+EntFire( "car_alarm_event", "AddOutput", "origin -1584 -2480 -43", 1 );
+//EntFire( "car_alarm_prop", "Kill", null, 0 );
+//EntFire( "car_alarm_event", "Kill", null, 0 );
+//make_prop( "physics", "_replace_alarm_car", "models/props_vehicles/cara_95sedan.mdl", "-1584 -2480 -15", "0 219 0", "shadow_no", "solid_yes", "138 37 9" );
+//make_prop( "dynamic", "_replace_alarm_car_glass", "models/props_vehicles/cara_95sedan_glass.mdl", "-1584 -2480 -15", "0 219 0", "shadow_no" );
+//EntFire( g_UpdateName + "_replace_alarm_car_glass",	"SetParent", g_UpdateName + "_replace_alarm_car", 0 );
 
 make_prop( "dynamic", "_oneway_little_crate", "models/props_crates/static_crate_40.mdl", "-1544 -4760 -291.53", "2.10389 352.602 88.4171", "shadow_no" );
 make_prop( "dynamic", "_oneway_big_crate", "models/props/de_nuke/crate_small.mdl", "-1604 -4764 -308.04", "1.21232 343.98 2.21686", "shadow_no" );
