@@ -98,6 +98,7 @@ function AllowTakeDamage(damageTable)
 	return true;
 }
 
+/*
 // CS Molotov
 // Precache detonate snd
 if (!IsSoundPrecached("weapons/molotov/molotov_detonate_swt_01.wav"))
@@ -143,6 +144,7 @@ function OnGameEvent_molotov_thrown(params)
         AddThinkToEnt(player, "MolotovKill");
 	}
 }
+*/
 
 // AWP Tweaks
 // Reserve Ammo
