@@ -8,7 +8,7 @@ DirectorOptions <-
 	MobSpawnMaxTime = 45
 	MobMinSize = 10
 	MobMaxSize = 25
-	MobMaxPending = 50
+	MobMaxPending = 30
 	SustainPeakMinTime = 5
 	SustainPeakMaxTime = 8
 	IntensityRelaxThreshold = 0.9
