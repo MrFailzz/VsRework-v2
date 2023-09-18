@@ -4657,8 +4657,9 @@ while ( wep_spawners = Entities.FindByClassname( wep_spawners, "weapon_*" ) )
 
 				// FIXES
 
-EntFire( "car_alarm_prop", "Kill", null, 1 );
-EntFire( "car_alarm_event", "Kill", null, 1 );
+EntFire( "car_alarm_prop", "Kill", null, 0 );
+EntFire( "car_alarm_event", "Kill", null, 0 );
+EntFire( "car_alarm_remarkable", "Kill", null, 0 );
 make_prop( "physics", "_replace_alarm_car", "models/props_vehicles/cara_95sedan.mdl", "-1508 -3500 -250.98", "0 159 0", "shadow_no", "solid_yes", "138 37 9" );
 make_prop( "dynamic", "_replace_alarm_car_glass", "models/props_vehicles/cara_95sedan_glass.mdl", "-1508 -3500 -250.98", "0 159 0", "shadow_no" );
 EntFire( g_UpdateName + "_replace_alarm_car_glass",	"SetParent", g_UpdateName + "_replace_alarm_car", 0 );
