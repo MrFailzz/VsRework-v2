@@ -4,23 +4,24 @@ DirectorOptions <-
 {
 	ProhibitBosses = true
 
-	MobSpawnMinTime = 25
-	MobSpawnMaxTime = 45
+	CommonLimit = 20
+	MobSpawnMinTime = 8
+	MobSpawnMaxTime = 10
 	MobMinSize = 10
-	MobMaxSize = 25
-	MobMaxPending = 30
-	SustainPeakMinTime = 5
-	SustainPeakMaxTime = 8
-	IntensityRelaxThreshold = 0.9
-	RelaxMinInterval = 15
-	RelaxMaxInterval = 25
-	RelaxMaxFlowTravel = 800	
+	MobMaxSize = 15
+	MobMaxPending = 20
+	SustainPeakMinTime = 3
+	SustainPeakMaxTime = 5
+	IntensityRelaxThreshold = 1.1
+	RelaxMinInterval = 6
+	RelaxMaxInterval = 10
+	RelaxMaxFlowTravel = 600	
 	BoomerLimit = 1
 	SpitterLimit = 1
 	SmokerLimit = 2
 	HunterLimit = 2
 	ChargerLimit = 1
-	SpecialRespawnInterval = 45.0
+	SpecialRespawnInterval = 20.0
 	PreferredMobDirection = SPAWN_ANYWHERE
 }
 
