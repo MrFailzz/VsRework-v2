@@ -4,7 +4,6 @@ DirectorOptions <-
 {
 	ProhibitBosses = true
 
-	CommonLimit = 20
 	MobSpawnMinTime = 6
 	MobSpawnMaxTime = 8
 	MobMinSize = 15
@@ -15,13 +14,13 @@ DirectorOptions <-
 	IntensityRelaxThreshold = 1.1
 	RelaxMinInterval = 3
 	RelaxMaxInterval = 5
-	RelaxMaxFlowTravel = 300
+	RelaxMaxFlowTravel = 200
 	BoomerLimit = 0
 	SmokerLimit = 1
 	HunterLimit = 1
 	ChargerLimit = 1
 	SpecialRespawnInterval = 10.0
-	PreferredMobDirection = SPAWN_ANYWHERE
+	PreferredMobDirection = SPAWN_FAR_AWAY_FROM_SURVIVORS
 }
 
 Director.ResetMobTimer()
