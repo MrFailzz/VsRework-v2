@@ -90,7 +90,7 @@
 				"Map" "c1m1_hotel"
 				"DisplayName" "#L4D360UI_LevelName_VERSUS_C1M1"
 				"Image" "maps/c1m1_hotel"
-				"VersusCompletionScore"	"400"
+				"VersusCompletionScore"	"500"
 				"versus_boss_spawning"
 				{
 					"spawn_pos_min"		"0.79"
@@ -105,7 +105,7 @@
 				"Map" "c1m2_streets"
 				"DisplayName" "#L4D360UI_LevelName_VERSUS_C1M2"
 				"Image" "maps/c1m2_streets"
-				"VersusCompletionScore"	"500"
+				"VersusCompletionScore"	"600"
 			}
 
 			"3"
@@ -113,7 +113,7 @@
 				"Map" "c1m3_mall"
 				"DisplayName" "#L4D360UI_LevelName_VERSUS_C1M3"
 				"Image" "maps/c1m3_mall"
-				"VersusCompletionScore"	"600"
+				"VersusCompletionScore"	"700"
 			}
 
 			"4"		
@@ -121,7 +121,7 @@
 				"Map" "c1m4_atrium"
 				"DisplayName" "#L4D360UI_LevelName_VERSUS_C1M4"
 				"Image" "maps/c1m4_atrium"
-				"VersusCompletionScore"	"700"
+				"VersusCompletionScore"	"800"
 			}
 		}	
 	

@@ -103,7 +103,7 @@
 				"HunterArmsVariant" "models\v_models\weapons\v_claw_hunter_l4d1.mdl"
 				"SmokerArmsVariant" "models\v_models\weapons\v_claw_smoker_l4d1.mdl"
 				"BoomerArmsVariant" "models\v_models\weapons\v_claw_boomer_l4d1.mdl"
-				"VersusCompletionScore"	"400"
+				"VersusCompletionScore"	"500"
 			}
 
 			"2"
@@ -119,7 +119,7 @@
 				"HunterArmsVariant" "models\v_models\weapons\v_claw_hunter_l4d1.mdl"
 				"SmokerArmsVariant" "models\v_models\weapons\v_claw_smoker_l4d1.mdl"
 				"BoomerArmsVariant" "models\v_models\weapons\v_claw_boomer_l4d1.mdl"
-				"VersusCompletionScore"	"600"
+				"VersusCompletionScore"	"700"
 			}
 
 		}	

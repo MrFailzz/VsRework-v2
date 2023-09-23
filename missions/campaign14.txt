@@ -81,7 +81,7 @@
 				"HunterArmsVariant" "models\v_models\weapons\v_claw_hunter_l4d1.mdl"
 				"SmokerArmsVariant" "models\v_models\weapons\v_claw_smoker_l4d1.mdl"
 				"BoomerArmsVariant" "models\v_models\weapons\v_claw_boomer_l4d1.mdl"
-				"VersusCompletionScore"	"400"
+				"VersusCompletionScore"	"500"
 				"versus_boss_spawning"
 				{
 					"spawn_pos_min"		"0.25"
@@ -105,7 +105,7 @@
 				"HunterArmsVariant" "models\v_models\weapons\v_claw_hunter_l4d1.mdl"
 				"SmokerArmsVariant" "models\v_models\weapons\v_claw_smoker_l4d1.mdl"
 				"BoomerArmsVariant" "models\v_models\weapons\v_claw_boomer_l4d1.mdl"
-				"VersusCompletionScore"	"600"
+				"VersusCompletionScore"	"700"
 				"versus_boss_spawning"
 				{
 					"tank_chance"		"0.25"

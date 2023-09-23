@@ -86,7 +86,7 @@
 				"Map" "c3m1_plankcountry"
 				"DisplayName" "#L4D360UI_LevelName_VERSUS_C3M1"
 				"Image" "maps/c3m1_plankcountry"
-				"VersusCompletionScore"	"400"
+				"VersusCompletionScore"	"500"
 				"versus_boss_spawning"
 				{
 					"spawn_pos_min"		"0.6"
@@ -100,7 +100,7 @@
 				"Map" "c3m2_swamp"
 				"DisplayName" "#L4D360UI_LevelName_VERSUS_C3M2"
 				"Image" "maps/c3m2_swamp"
-				"VersusCompletionScore"	"500"
+				"VersusCompletionScore"	"600"
 			}
 
 			"3"
@@ -108,7 +108,7 @@
 				"Map" "c3m3_shantytown"
 				"DisplayName" "#L4D360UI_LevelName_VERSUS_C3M3"
 				"Image" "maps/c3m3_shantytown"
-				"VersusCompletionScore"	"600"
+				"VersusCompletionScore"	"700"
 			}
 
 			"4"		
@@ -116,7 +116,7 @@
 				"Map" "c3m4_plantation"
 				"DisplayName" "#L4D360UI_LevelName_VERSUS_C3M4"
 				"Image" "maps/c3m4_plantation"
-				"VersusCompletionScore"	"700"
+				"VersusCompletionScore"	"800"
 			}
 		}	
 	
