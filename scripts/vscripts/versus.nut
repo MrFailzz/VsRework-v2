@@ -19,7 +19,7 @@ function OnGameEvent_heal_success(params)
 // Reduce bonus when defibs used
 function OnGameEvent_defibrillator_used(params)
 {
-	Convars.SetValue("vs_survival_bonus", survivorBonus - 5);
+	Convars.SetValue("vs_survival_bonus", survivorBonus - 3);
 	survivorBonus -= 5;
 	
 	// Do not let survival bonus go below 0
@@ -27,6 +27,7 @@ function OnGameEvent_defibrillator_used(params)
 		Convars.SetValue("vs_survival_bonus", 0);
 }
 
+/*
 // Scale tiebreaker w/ distance pts
 if (Director.GetMapNumber() == 0)
 	Convars.SetValue("vs_tiebreak_bonus", 40);
@@ -42,6 +43,7 @@ else if (Director.GetMapNumber() == 3)
 	
 else if (Director.GetMapNumber() == 4)
 	Convars.SetValue("vs_tiebreak_bonus", 80);
+*/
 
 // Reduce Autosniper DMG vs Tanks
 function AllowTakeDamage(damageTable)
