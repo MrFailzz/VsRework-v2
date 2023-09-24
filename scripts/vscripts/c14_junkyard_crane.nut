@@ -19,7 +19,7 @@ DirectorOptions <-
 	SmokerLimit = 1
 	HunterLimit = 1
 	ChargerLimit = 1
-	SpecialRespawnInterval = 10.0
+	SpecialRespawnInterval = 5.0
 	PreferredMobDirection = SPAWN_FAR_AWAY_FROM_SURVIVORS
 }
 
