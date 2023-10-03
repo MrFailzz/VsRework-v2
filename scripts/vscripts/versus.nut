@@ -1,9 +1,23 @@
 Msg("VERSUS++\n");
 
+// CVAR tweaks (gamemodes.txt)
+Convars.SetValue("upgrade_laser_sight_spread_factor", 0.6)
+Convars.SetValue("z_max_survivor_damage", 100)
+Convars.SetValue("z_jockey_control_variance", 0)
+Convars.SetValue("z_jockey_control_min", 0.68)
+Convars.SetValue("z_jockey_control_max", 0.68)
+Convars.SetValue("versus_tank_flow_team_variation", 0.00)
+Convars.SetValue("versus_witch_flow_team_variation", 0.00)
+Convars.SetValue("z_tank_damage_slow_min_range", -600)
+Convars.SetValue("tank_burn_duration", 90)
+Convars.SetValue("z_witch_damage_per_kill_hit", 20)
+Convars.SetValue("z_witch_wander_personal_time", 7)
+Convars.SetValue("hud_deathnotice_threats", 1)
+
 // Scoring Tweaks
+survivorBonus <- 25
 Convars.SetValue("vs_survival_bonus", 25)
 Convars.SetValue("vs_defib_penalty", 0)
-survivorBonus <- 25
 
 // Reduce bonus when medkits used
 function OnGameEvent_heal_success(params)
@@ -19,15 +33,14 @@ function OnGameEvent_heal_success(params)
 // Reduce bonus when defibs used
 function OnGameEvent_defibrillator_used(params)
 {
-	Convars.SetValue("vs_survival_bonus", survivorBonus - 3);
-	survivorBonus -= 3;
+	Convars.SetValue("vs_survival_bonus", survivorBonus - 2);
+	survivorBonus -= 2;
 	
 	// Do not let survival bonus go below 0
 	if (Convars.GetFloat("vs_survival_bonus") < 0)
 		Convars.SetValue("vs_survival_bonus", 0);
 }
 
-/*
 // Scale tiebreaker w/ distance pts
 if (Director.GetMapNumber() == 0)
 	Convars.SetValue("vs_tiebreak_bonus", 40);
@@ -43,25 +56,20 @@ else if (Director.GetMapNumber() == 3)
 	
 else if (Director.GetMapNumber() == 4)
 	Convars.SetValue("vs_tiebreak_bonus", 80);
-*/
 
-// Reduce Autosniper DMG vs Tanks
+// Autosniper tweaks
 function AllowTakeDamage(damageTable)
 {
-	//Table values
+	// Table values
 	local damageDone = damageTable.DamageDone;
+	local originalDamageDone = damageTable.DamageDone;
 	local attacker = damageTable.Attacker;
-	local attackerPlayer = attacker.IsPlayer();
-	local attackerType = attacker.GetClassname();
 	local victim = damageTable.Victim;
-	local victimPlayer = victim.IsPlayer();
-	local victimType = victim.GetClassname();
-	local inflictor = damageTable.Inflictor;
-	local inflictorClass = null;
-	if (inflictor.IsValid())
-	{
-		inflictorClass = inflictor.GetClassname();
-	}
+	local attackerPlayer = null;
+	local attackerClass = null;
+	local attackerType = null;
+	local victimPlayer = null;
+	local victimType = null;
 	local weapon = damageTable.Weapon;
 	local weaponClass = null;
 	if (weapon != null)
@@ -70,18 +78,18 @@ function AllowTakeDamage(damageTable)
 	}
 	local damageType = damageTable.DamageType;
 
-	//Modifiers
+	// Modifiers
 	local damageModifier = 0.90;
 
-	//Modify Attacker damage
+	// Modify Attacker damage
 	if (attacker.IsValid())
 	{
 		if (attacker.IsPlayer())
 		{
-			//Survivor dealing damage
+			// Survivor dealing damage
 			if (attacker.IsSurvivor())
 			{
-				//Snipers
+				// Modify autosniper DMG
 				if (weaponClass == "weapon_hunting_rifle" || weaponClass == "weapon_sniper_military")
 				{
                     if (victimPlayer == true)
