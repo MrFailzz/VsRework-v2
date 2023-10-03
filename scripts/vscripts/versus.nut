@@ -20,7 +20,7 @@ function OnGameEvent_heal_success(params)
 function OnGameEvent_defibrillator_used(params)
 {
 	Convars.SetValue("vs_survival_bonus", survivorBonus - 3);
-	survivorBonus -= 5;
+	survivorBonus -= 3;
 	
 	// Do not let survival bonus go below 0
 	if (Convars.GetFloat("vs_survival_bonus") < 0)
