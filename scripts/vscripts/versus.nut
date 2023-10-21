@@ -1,7 +1,7 @@
 Msg("VERSUS++\n");
 
 // CVAR tweaks (gamemodes.txt)
-Convars.SetValue("upgrade_laser_sight_spread_factor", 0.6)
+Convars.SetValue("upgrade_laser_sight_spread_factor", 0.75)
 Convars.SetValue("z_max_survivor_damage", 100)
 Convars.SetValue("z_jockey_control_variance", 0)
 Convars.SetValue("z_jockey_control_min", 0.68)
@@ -9,10 +9,8 @@ Convars.SetValue("z_jockey_control_max", 0.68)
 Convars.SetValue("versus_tank_flow_team_variation", 0.00)
 Convars.SetValue("versus_witch_flow_team_variation", 0.00)
 Convars.SetValue("z_tank_damage_slow_min_range", -600)
-Convars.SetValue("tank_burn_duration", 90)
 Convars.SetValue("z_witch_damage_per_kill_hit", 20)
 Convars.SetValue("z_witch_wander_personal_time", 7)
-Convars.SetValue("hud_deathnotice_threats", 1)
 
 // Scoring Tweaks
 survivorBonus <- 25
@@ -22,8 +20,8 @@ Convars.SetValue("vs_defib_penalty", 0)
 // Reduce bonus when medkits used
 function OnGameEvent_heal_success(params)
 {
-	Convars.SetValue("vs_survival_bonus", survivorBonus - 1);
-	survivorBonus -= 1;
+	Convars.SetValue("vs_survival_bonus", survivorBonus - 2);
+	survivorBonus -= 2;
 
 	// Do not let survival bonus go below 0
 	if (Convars.GetFloat("vs_survival_bonus") < 0)
