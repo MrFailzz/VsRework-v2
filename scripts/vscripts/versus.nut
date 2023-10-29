@@ -1,7 +1,7 @@
 Msg("VERSUS++\n");
 
 // CVAR tweaks (gamemodes.txt)
-Convars.SetValue("upgrade_laser_sight_spread_factor", 0.75)
+Convars.SetValue("upgrade_laser_sight_spread_factor", 0.67)
 Convars.SetValue("z_max_survivor_damage", 100)
 Convars.SetValue("z_jockey_control_variance", 0)
 Convars.SetValue("z_jockey_control_min", 0.68)

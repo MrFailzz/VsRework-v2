@@ -10,10 +10,10 @@ DirectorOptions <-
 	MobSpawnMaxTime = 12
 	MobMinSize = 10
 	MobMaxSize = 15
-	MobMaxPending = 20
+	MobMaxPending = 15
 	SustainPeakMinTime = 3
 	SustainPeakMaxTime = 5
-	IntensityRelaxThreshold = 0.99
+	IntensityRelaxThreshold = 0.95
 	RelaxMinInterval = 6
 	RelaxMaxInterval = 10
 	RelaxMaxFlowTravel = 400
@@ -25,5 +25,3 @@ DirectorOptions <-
 	SpecialRespawnInterval = 20.0
 	PreferredMobDirection = SPAWN_FAR_AWAY_FROM_SURVIVORS
 }
-
-Director.ResetMobTimer()
