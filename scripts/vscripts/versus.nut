@@ -3,14 +3,51 @@ Msg("VERSUS++\n");
 // CVAR tweaks (gamemodes.txt)
 Convars.SetValue("upgrade_laser_sight_spread_factor", 0.67)
 Convars.SetValue("z_max_survivor_damage", 100)
-Convars.SetValue("z_jockey_control_variance", 0)
-Convars.SetValue("z_jockey_control_min", 0.68)
-Convars.SetValue("z_jockey_control_max", 0.68)
+//Convars.SetValue("z_jockey_control_variance", 0)
+//Convars.SetValue("z_jockey_control_min", 0.68)
+//Convars.SetValue("z_jockey_control_max", 0.68)
 Convars.SetValue("versus_tank_flow_team_variation", 0.00)
 Convars.SetValue("versus_witch_flow_team_variation", 0.00)
-Convars.SetValue("z_tank_damage_slow_min_range", -600)
+Convars.SetValue("z_tank_damage_slow_min_range", -400)
 Convars.SetValue("z_witch_damage_per_kill_hit", 20)
 Convars.SetValue("z_witch_wander_personal_time", 7)
+Convars.SetValue("z_gun_swing_vs_min_penalty", 5)
+Convars.SetValue("z_gun_swing_vs_max_penalty", 7)
+
+function GetSurvivorID(player)
+{
+	switch(player.GetModelName())
+	{
+		case "models/survivors/survivor_gambler.mdl":
+			return 0;
+			break;
+		case "models/survivors/survivor_producer.mdl":
+			return 1;
+			break;
+		case "models/survivors/survivor_coach.mdl":
+			return 2;
+			break;
+		case "models/survivors/survivor_mechanic.mdl":
+			return 3;
+			break;
+		case "models/survivors/survivor_namvet.mdl":
+			return 0;
+			break;
+		case "models/survivors/survivor_teenangst.mdl":
+			return 1;
+			break;
+		case "models/survivors/survivor_manager.mdl":
+			return 2;
+			break;
+		case "models/survivors/survivor_biker.mdl":
+			return 3;
+			break;
+		default:
+			return -1;
+			break;
+	}
+}
+::GetSurvivorID <- GetSurvivorID;
 
 // Scoring Tweaks
 survivorBonus <- 25
@@ -90,7 +127,7 @@ function AllowTakeDamage(damageTable)
 				// Modify autosniper DMG
 				if (weaponClass == "weapon_hunting_rifle" || weaponClass == "weapon_sniper_military")
 				{
-                    if (victimPlayer == true)
+                    if (victimPlayer)
                     {
                         if (victim.GetZombieType() == 8)
                         {
@@ -190,4 +227,76 @@ function OnGameEvent_round_start(params)
 		// Remove grenade launcher spawns
 		weapon_launcher.Kill();                
     }
+}
+
+// Shove rework
+baseShovePenalty <- [0, 0, 0, 0];
+
+function Update()
+{
+	local player = null;
+	while ((player = Entities.FindByClassname(player, "player")) != null)
+	{
+		if (player.IsValid())
+		{
+			if (player.IsSurvivor())
+			{
+				ApplyShovePenalties(player);
+				UpdateShovePenalty(player);
+			}
+		}
+	}
+}
+
+function ApplyShovePenalties(player)
+{
+	local survivorID = GetSurvivorID(player);
+	local weaponClass = "";
+	local weapon = player.GetActiveWeapon();
+	local shovePenalty = 0;
+
+	if (weapon != null)
+	{
+		if (weapon.IsValid())
+		{
+			weaponClass = weapon.GetClassname();
+
+			switch(weaponClass)
+			{
+				case "weapon_shotgun_chrome":
+				case "weapon_pumpshotgun":
+				case "weapon_sniper_scout":
+					shovePenalty += 2;
+				break;
+				case "weapon_rifle":
+				case "weapon_rifle_sg552":
+				case "weapon_rifle_desert":
+					shovePenalty += 2;
+				break;
+				case "weapon_rifle_ak47":
+					shovePenalty += 3;
+				break;
+				case "weapon_autoshotgun":
+				case "weapon_shotgun_spas":
+				case "weapon_hunting_rifle":
+				case "weapon_sniper_military":
+				case "weapon_sniper_awp":
+					shovePenalty += 4;
+				break;
+			}
+		}
+	}
+
+	baseShovePenalty[survivorID] = shovePenalty;
+}
+
+function UpdateShovePenalty(player)
+{
+	local survivorID = GetSurvivorID(player);
+	local shovePenalty = NetProps.GetPropInt(player, "m_iShovePenalty");
+
+	if (shovePenalty < baseShovePenalty[survivorID])
+	{
+		NetProps.SetPropInt(player, "m_iShovePenalty", baseShovePenalty[survivorID]);
+	}
 }
