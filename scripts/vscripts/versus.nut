@@ -193,8 +193,9 @@ function OnGameEvent_molotov_thrown(params)
 
 // AWP Tweaks
 // Reserve Ammo
-Convars.SetValue("ammo_minigun_max", 20);
+Convars.SetValue("ammo_minigun_max", 60);
 
+/*
 // Spawns
 function OnGameEvent_round_start(params)
 {
@@ -228,8 +229,10 @@ function OnGameEvent_round_start(params)
 		weapon_launcher.Kill();                
     }
 }
+*/
 
-// Shove rework
+// Shove Rework
+// Weapons now have unique "stamina" in regards to shoving
 baseShovePenalty <- [0, 0, 0, 0];
 
 function Update()
