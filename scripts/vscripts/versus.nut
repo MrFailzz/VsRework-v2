@@ -266,19 +266,18 @@ function ApplyShovePenalties(player)
 				case "weapon_shotgun_chrome":
 				case "weapon_pumpshotgun":
 				case "weapon_sniper_scout":
-					shovePenalty += 2;
-				break;
 				case "weapon_rifle":
 				case "weapon_rifle_sg552":
 				case "weapon_rifle_desert":
 					shovePenalty += 2;
 				break;
+
 				case "weapon_rifle_ak47":
+				case "weapon_hunting_rifle":
 					shovePenalty += 3;
 				break;
 				case "weapon_autoshotgun":
 				case "weapon_shotgun_spas":
-				case "weapon_hunting_rifle":
 				case "weapon_sniper_military":
 				case "weapon_sniper_awp":
 					shovePenalty += 4;
