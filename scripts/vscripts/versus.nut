@@ -1,6 +1,8 @@
 Msg("VERSUS++\n");
 
 // CVAR tweaks (gamemodes.txt)
+Convars.SetValue("z_hunter_limit", 1)
+Convars.SetValue("z_smoker_limit", 1)
 Convars.SetValue("upgrade_laser_sight_spread_factor", 0.67)
 Convars.SetValue("z_max_survivor_damage", 100)
 //Convars.SetValue("z_jockey_control_variance", 0)
@@ -13,6 +15,7 @@ Convars.SetValue("z_witch_damage_per_kill_hit", 20)
 Convars.SetValue("z_witch_wander_personal_time", 7)
 Convars.SetValue("z_gun_swing_vs_min_penalty", 5)
 Convars.SetValue("z_gun_swing_vs_max_penalty", 7)
+Convars.SetValue("ammo_minigun_max", 60);
 
 function GetSurvivorID(player)
 {
@@ -49,50 +52,21 @@ function GetSurvivorID(player)
 }
 ::GetSurvivorID <- GetSurvivorID;
 
-// Scoring Tweaks
-/*
-survivorBonus <- 25
-Convars.SetValue("vs_survival_bonus", 25)
-Convars.SetValue("vs_defib_penalty", 0)
-
-// Reduce bonus when medkits used
-function OnGameEvent_heal_success(params)
-{
-	Convars.SetValue("vs_survival_bonus", survivorBonus - 2);
-	survivorBonus -= 2;
-
-	// Do not let survival bonus go below 0
-	if (Convars.GetFloat("vs_survival_bonus") < 0)
-		Convars.SetValue("vs_survival_bonus", 0);
-}
-
-// Reduce bonus when defibs used
-function OnGameEvent_defibrillator_used(params)
-{
-	Convars.SetValue("vs_survival_bonus", survivorBonus - 2);
-	survivorBonus -= 2;
-	
-	// Do not let survival bonus go below 0
-	if (Convars.GetFloat("vs_survival_bonus") < 0)
-		Convars.SetValue("vs_survival_bonus", 0);
-}
-*/
-
 // Scale tiebreaker w/ distance pts
 if (Director.GetMapNumber() == 0)
-	Convars.SetValue("vs_tiebreak_bonus", 40);
+	Convars.SetValue("vs_tiebreak_bonus", 20);
 
 else if (Director.GetMapNumber() == 1)
-	Convars.SetValue("vs_tiebreak_bonus", 50);
+	Convars.SetValue("vs_tiebreak_bonus", 25);
 
 else if (Director.GetMapNumber() == 2)
-	Convars.SetValue("vs_tiebreak_bonus", 60);
+	Convars.SetValue("vs_tiebreak_bonus", 30);
 
 else if (Director.GetMapNumber() == 3)
-	Convars.SetValue("vs_tiebreak_bonus", 70);
+	Convars.SetValue("vs_tiebreak_bonus", 35);
 	
 else if (Director.GetMapNumber() == 4)
-	Convars.SetValue("vs_tiebreak_bonus", 80);
+	Convars.SetValue("vs_tiebreak_bonus", 40);
 
 // Autosniper tweaks
 function AllowTakeDamage(damageTable)
@@ -144,94 +118,6 @@ function AllowTakeDamage(damageTable)
 	damageTable.DamageDone = damageDone;
 	return true;
 }
-
-/*
-// CS Molotov
-// Precache detonate snd
-if (!IsSoundPrecached("weapons/molotov/molotov_detonate_swt_01.wav"))
-	PrecacheSound("weapons/molotov/molotov_detonate_swt_01.wav");
-
-function OnGameEvent_molotov_thrown(params)
-{
-	local player = GetPlayerFromUserID(params["userid"]);
-
-	if (player.ValidateScriptScope())
-	{
-		local player_entityscript = player.GetScriptScope();
-		player_entityscript["TickCount"] <- 0;
-        player_entityscript["MolotovKill"] <- function()
-		{
-			if (player_entityscript["TickCount"] == 10)
-			{
-                local molotov_projectile = null;
-                if ((molotov_projectile = Entities.FindByClassname(molotov_projectile, "molotov_projectile")) != null)
-                {
-                    //Explosion VFX
-                    local molotov_origin = molotov_projectile.GetOrigin();
-                    local explEnt = SpawnEntityFromTable("info_particle_system",
-                    {
-                        targetname = "explEnt",
-                        origin = molotov_origin,
-                        start_active = 1,
-                        effect_name = "fire_large_01"
-                    });
-
-                    EmitSoundOn("weapons/molotov/molotov_detonate_swt_01.wav", molotov_projectile);
-                    molotov_projectile.Kill();
-                }
-			}
-            else if (player_entityscript["TickCount"] >= 11)
-            {
-                EntFire("explEnt", "Kill");
-                return
-            }
-			player_entityscript["TickCount"]++;
-			return
-		}
-        AddThinkToEnt(player, "MolotovKill");
-	}
-}
-*/
-
-// AWP Tweaks
-// Reserve Ammo
-Convars.SetValue("ammo_minigun_max", 60);
-
-/*
-// Spawns
-function OnGameEvent_round_start(params)
-{
-	local weapon_awp = null;
-	local weapon_launcher = null;
-
-	// Remove AWP spawns
-	while(weapon_awp = Entities.FindByModel(weapon_awp, "models/w_models/weapons/w_sniper_awp.mdl"))
-		weapon_awp.Kill();                
-
-	// Replace grenade launcher with AWP
-	while(weapon_launcher = Entities.FindByModel(weapon_launcher, "models/w_models/weapons/w_grenade_launcher.mdl"))
-    {
-		local weapon_originX = weapon_launcher.GetOrigin().x;
-        local weapon_originY = weapon_launcher.GetOrigin().y;
-	    local weapon_originZ = weapon_launcher.GetOrigin().z;
-	    local weapon_angleX = weapon_launcher.GetAngles().x;
-	    local weapon_angleY = weapon_launcher.GetAngles().y;
-	    local weaponName = "AWP_spawn";
-	    local weaponSpawn = SpawnEntityFromTable("weapon_sniper_awp",
-	    {
-		    targetname = weaponName,
-		    origin = Vector(weapon_originX, weapon_originY, weapon_originZ),
-		    angles = Vector(weapon_angleX, weapon_angleY, 0)
-		    solid = 0,
-		    disableshadows = 1,
-            ammo = 20,
-	    });
-
-		// Remove grenade launcher spawns
-		weapon_launcher.Kill();                
-    }
-}
-*/
 
 // Shove Rework
 // Weapons now have unique "stamina" in regards to shoving
