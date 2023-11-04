@@ -4,8 +4,6 @@ DirectorOptions <-
 {
 	ProhibitBosses = true
 
-	AlwaysAllowWanderers = true
-	NumReservedWanderers = 10
 	MobSpawnMinTime = 6
 	MobSpawnMaxTime = 8
 	MobMinSize = 15

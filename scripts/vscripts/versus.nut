@@ -50,6 +50,7 @@ function GetSurvivorID(player)
 ::GetSurvivorID <- GetSurvivorID;
 
 // Scoring Tweaks
+/*
 survivorBonus <- 25
 Convars.SetValue("vs_survival_bonus", 25)
 Convars.SetValue("vs_defib_penalty", 0)
@@ -75,6 +76,7 @@ function OnGameEvent_defibrillator_used(params)
 	if (Convars.GetFloat("vs_survival_bonus") < 0)
 		Convars.SetValue("vs_survival_bonus", 0);
 }
+*/
 
 // Scale tiebreaker w/ distance pts
 if (Director.GetMapNumber() == 0)
@@ -266,6 +268,12 @@ function ApplyShovePenalties(player)
 
 			switch(weaponClass)
 			{
+				case "weapon_pistol_magnum":
+				case "weapon_smg":
+				case "weapon_smg_silenced":
+					shovePenalty += 1;
+				break;
+				case "weapon_melee":
 				case "weapon_shotgun_chrome":
 				case "weapon_pumpshotgun":
 				case "weapon_sniper_scout":
@@ -284,6 +292,9 @@ function ApplyShovePenalties(player)
 				case "weapon_sniper_military":
 				case "weapon_sniper_awp":
 					shovePenalty += 4;
+				break;
+				default:
+					shovePenalty = 0;
 				break;
 			}
 		}
