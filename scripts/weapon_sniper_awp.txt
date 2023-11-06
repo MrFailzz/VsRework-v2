@@ -5,8 +5,8 @@ WeaponData
 	"SpreadPerShot"			"1"
 	"MaxSpread"			"15"
 	"SpreadDecay"			"8"
-	"MinDuckingSpread"		"0"
-	"MinStandingSpread"		"0.1"
+	"MinDuckingSpread"		"0.05"
+	"MinStandingSpread"		"0.5"
 	"MinInAirSpread"		"1.5"
 	"MaxMovementSpread"		"5"
 	"AddonAttachment"		"primary"
@@ -62,7 +62,7 @@ WeaponData
 	"PenetrationMaxDistance"	"0"	// none
 	"CharacterPenetrationMaxDistance" "8192" // Shooting through infected is doesn't count against penetration count out to this range
 
-	"Damage"			"215"
+	"Damage"			"205"
 	"Range"				"8192"
 	"RangeModifier"			"0.99"
 	"GainRange"			"1500"	// range at which to use a gain curve to fall off to zero

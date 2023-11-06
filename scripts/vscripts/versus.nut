@@ -1,20 +1,21 @@
 Msg("VERSUS++\n");
 
 // CVAR tweaks (gamemodes.txt)
-Convars.SetValue("z_hunter_limit", 1)
-Convars.SetValue("z_smoker_limit", 1)
-Convars.SetValue("upgrade_laser_sight_spread_factor", 0.67)
-Convars.SetValue("z_max_survivor_damage", 100)
-//Convars.SetValue("z_jockey_control_variance", 0)
-//Convars.SetValue("z_jockey_control_min", 0.68)
-//Convars.SetValue("z_jockey_control_max", 0.68)
-Convars.SetValue("versus_tank_flow_team_variation", 0.00)
-Convars.SetValue("versus_witch_flow_team_variation", 0.00)
-Convars.SetValue("z_tank_damage_slow_min_range", -400)
-Convars.SetValue("z_witch_damage_per_kill_hit", 20)
-Convars.SetValue("z_witch_wander_personal_time", 7)
-Convars.SetValue("z_gun_swing_vs_min_penalty", 5)
-Convars.SetValue("z_gun_swing_vs_max_penalty", 7)
+Convars.SetValue("z_hunter_limit", 1);
+Convars.SetValue("z_smoker_limit", 1);
+Convars.SetValue("z_pounce_damage_interrupt", 190);
+Convars.SetValue("upgrade_laser_sight_spread_factor", 0.67);
+Convars.SetValue("z_max_survivor_damage", 100);
+Convars.SetValue("z_jockey_control_variance", 0.35);
+//Convars.SetValue("z_jockey_control_min", 0.68);
+//Convars.SetValue("z_jockey_control_max", 0.68);
+Convars.SetValue("versus_tank_flow_team_variation", 0.00);
+Convars.SetValue("versus_witch_flow_team_variation", 0.00);
+Convars.SetValue("z_tank_damage_slow_min_range", -400);
+Convars.SetValue("z_witch_damage_per_kill_hit", 20);
+Convars.SetValue("z_witch_wander_personal_time", 7);
+Convars.SetValue("z_gun_swing_vs_min_penalty", 5);
+Convars.SetValue("z_gun_swing_vs_max_penalty", 7);
 Convars.SetValue("ammo_minigun_max", 60);
 
 function GetSurvivorID(player)
@@ -51,6 +52,33 @@ function GetSurvivorID(player)
 	}
 }
 ::GetSurvivorID <- GetSurvivorID;
+
+// Scoring Tweaks
+survivorBonus <- 25
+Convars.SetValue("vs_survival_bonus", 25)
+Convars.SetValue("vs_defib_penalty", 0)
+
+// Reduce bonus when medkits used
+function OnGameEvent_heal_success(params)
+{
+	Convars.SetValue("vs_survival_bonus", survivorBonus - 2);
+	survivorBonus -= 2;
+
+	// Do not let survival bonus go below 0
+	if (Convars.GetFloat("vs_survival_bonus") < 0)
+		Convars.SetValue("vs_survival_bonus", 0);
+}
+
+// Reduce bonus when defibs used
+function OnGameEvent_defibrillator_used(params)
+{
+	Convars.SetValue("vs_survival_bonus", survivorBonus - 2);
+	survivorBonus -= 2;
+	
+	// Do not let survival bonus go below 0
+	if (Convars.GetFloat("vs_survival_bonus") < 0)
+		Convars.SetValue("vs_survival_bonus", 0);
+}
 
 // Scale tiebreaker w/ distance pts
 if (Director.GetMapNumber() == 0)
