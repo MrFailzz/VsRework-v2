@@ -160,7 +160,6 @@ function PlayerHurt(params)
 
 	if (player.IsValid())
 	{
-		// Non-tank infected hurt
 		if (player.GetZombieType() != 8)
 		{
 			if ("type" in params)
@@ -189,7 +188,6 @@ function PlayerHurt(params)
 ////////////////////////
 // Shove Rework
 ////////////////////////
-// Weapons now have unique "stamina" in regards to shoving
 function ApplyShovePenalties(player)
 {
 	local survivorID = GetSurvivorID(player);
@@ -237,6 +235,7 @@ function ApplyShovePenalties(player)
 		}
 	}
 
+	// Weapons now have unique "stamina" in regards to shoving
 	baseShovePenalty[survivorID] = shovePenalty;
 }
 
@@ -246,4 +245,28 @@ function UpdateShovePenalty(player)
 	local shovePenalty = NetProps.GetPropInt(player, "m_iShovePenalty");
 
 	if (shovePenalty < baseShovePenalty[survivorID]) NetProps.SetPropInt(player, "m_iShovePenalty", baseShovePenalty[survivorID]);
+}
+
+////////////////////////
+// Tank Announce
+////////////////////////
+function OnGameEvent_tank_spawn(params)
+{
+	local env_tank_hint = SpawnEntityFromTable("env_instructor_hint",
+	{
+		targetname = "env_tank_hint",
+		hint_static = 1,
+		hint_timeout = 10,
+		hint_range = 0,
+		hint_nooffscreen = 0,
+		hint_icon_onscreen = "zombie_team_tank",
+		hint_icon_offscreen = "zombie_team_tank",
+		hint_binding = "",
+		hint_forcecaption = 1,
+		hint_color = "255 255 255",
+		hint_caption = "Be ready to fight the Tank"
+	});
+
+	// Show instructor hint to prepare for the Tank
+	EntFire("env_tank_hint", "ShowHint")
 }
