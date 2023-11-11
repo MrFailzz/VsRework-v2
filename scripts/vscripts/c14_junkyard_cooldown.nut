@@ -4,18 +4,16 @@ DirectorOptions <-
 {
 	ProhibitBosses = true
 
-	AlwaysAllowWanderers = true
-	NumReservedWanderers = 5
-	CommonLimit = 15
-	MobSpawnMinTime = 8
-	MobSpawnMaxTime = 16
-	MobMinSize = 10
-	MobMaxSize = 15
-	MobMaxPending = 15
-	SustainPeakMinTime = 3
-	SustainPeakMaxTime = 5
-	IntensityRelaxThreshold = 0.95
-	RelaxMinInterval = 6
+	CommonLimit = 20
+	MobSpawnMinTime = 5
+	MobSpawnMaxTime = 15
+	MobMinSize = 5
+	MobMaxSize = 10
+	MobMaxPending = 10
+	SustainPeakMinTime = 1
+	SustainPeakMaxTime = 3
+	IntensityRelaxThreshold = 0.90
+	RelaxMinInterval = 5
 	RelaxMaxInterval = 10
 	RelaxMaxFlowTravel = 400
 	BoomerLimit = 1
@@ -25,4 +23,5 @@ DirectorOptions <-
 	ChargerLimit = 1
 	SpecialRespawnInterval = 20.0
 	PreferredMobDirection = SPAWN_FAR_AWAY_FROM_SURVIVORS
+	ZombieSpawnRange = 2000
 }
