@@ -1,9 +1,17 @@
 Msg("VERSUS++\n");
 
-// CVAR tweaks (gamemodes.txt)
+////////////////////////
+// Globals
+////////////////////////
+baseShovePenalty <- [0, 0, 0, 0];
+
+////////////////////////
+// CVAR tweaks 
+////////////////////////
+// (gamemodes.txt)
 Convars.SetValue("z_hunter_limit", 1);
 Convars.SetValue("z_smoker_limit", 1);
-Convars.SetValue("z_pounce_damage_interrupt", 190);
+Convars.SetValue("z_pounce_damage_interrupt", 185);
 Convars.SetValue("z_max_stagger_duration", 4);
 Convars.SetValue("z_max_survivor_damage", 100);
 Convars.SetValue("z_jockey_control_variance", 0.35);
@@ -19,6 +27,9 @@ Convars.SetValue("z_gun_swing_vs_min_penalty", 5);
 Convars.SetValue("z_gun_swing_vs_max_penalty", 7);
 Convars.SetValue("ammo_minigun_max", 60);
 
+////////////////////////
+// Stock functions
+////////////////////////
 function GetSurvivorID(player)
 {
 	switch(player.GetModelName())
@@ -54,50 +65,32 @@ function GetSurvivorID(player)
 }
 ::GetSurvivorID <- GetSurvivorID;
 
-// Scoring Tweaks
-survivorBonus <- 25
-Convars.SetValue("vs_survival_bonus", 25)
-Convars.SetValue("vs_defib_penalty", 0)
-
-// Reduce bonus when medkits used
-function OnGameEvent_heal_success(params)
+function GetVectorDistance(vec1, vec2)
 {
-	Convars.SetValue("vs_survival_bonus", survivorBonus - 2);
-	survivorBonus -= 2;
+	return sqrt(pow(vec1.x - vec2.x,2) + pow(vec1.y - vec2.y,2) + pow(vec1.z - vec2.z,2));
+}
+::zGetVectorDistance <- GetVectorDistance;
 
-	// Do not let survival bonus go below 0
-	if (Convars.GetFloat("vs_survival_bonus") < 0)
-		Convars.SetValue("vs_survival_bonus", 0);
+function Update()
+{
+	local player = null;
+	while ((player = Entities.FindByClassname(player, "player")) != null)
+	{
+		if (player.IsValid())
+		{
+			if (player.IsSurvivor())
+			{
+				ApplyShovePenalties(player);
+				UpdateShovePenalty(player);
+				//UpdateScoring(player);
+			}
+		}
+	}
 }
 
-// Reduce bonus when defibs used
-function OnGameEvent_defibrillator_used(params)
-{
-	Convars.SetValue("vs_survival_bonus", survivorBonus - 2);
-	survivorBonus -= 2;
-	
-	// Do not let survival bonus go below 0
-	if (Convars.GetFloat("vs_survival_bonus") < 0)
-		Convars.SetValue("vs_survival_bonus", 0);
-}
-
-// Scale tiebreaker w/ distance pts
-if (Director.GetMapNumber() == 0)
-	Convars.SetValue("vs_tiebreak_bonus", 20);
-
-else if (Director.GetMapNumber() == 1)
-	Convars.SetValue("vs_tiebreak_bonus", 25);
-
-else if (Director.GetMapNumber() == 2)
-	Convars.SetValue("vs_tiebreak_bonus", 30);
-
-else if (Director.GetMapNumber() == 3)
-	Convars.SetValue("vs_tiebreak_bonus", 35);
-	
-else if (Director.GetMapNumber() == 4)
-	Convars.SetValue("vs_tiebreak_bonus", 40);
-
-// Autosniper tweaks
+////////////////////////
+// Damage tweaks
+////////////////////////
 function AllowTakeDamage(damageTable)
 {
 	// Table values
@@ -119,14 +112,14 @@ function AllowTakeDamage(damageTable)
 	local damageType = damageTable.DamageType;
 
 	// Modifiers
-	local damageModifier = 0.90;
+	local sniperModifier = 0.90;
+	local smgModifier = 0.90625;
 
 	// Modify Attacker damage
 	if (attacker.IsValid())
 	{
 		if (attacker.IsPlayer())
 		{
-			// Survivor dealing damage
 			if (attacker.IsSurvivor())
 			{
 				// Modify autosniper DMG
@@ -136,9 +129,20 @@ function AllowTakeDamage(damageTable)
                     {
                         if (victim.GetZombieType() == 8)
                         {
-                            damageDone = damageDone * damageModifier;
+                            damageDone = damageDone * sniperModifier;
                         }
                     }
+				}
+				// Modify smg headshot DMG
+				if (weaponClass == "weapon_smg_silenced")
+				{
+					if ((damageType & DMG_HEADSHOT) == DMG_HEADSHOT)
+					{
+						if (victimPlayer)
+						{
+							damageDone = damageDone * smgModifier;
+						}
+					}
 				}
 			}
 		}
@@ -148,26 +152,46 @@ function AllowTakeDamage(damageTable)
 	return true;
 }
 
-// Shove Rework
-// Weapons now have unique "stamina" in regards to shoving
-baseShovePenalty <- [0, 0, 0, 0];
-
-function Update()
+////////////////////////
+// Slowdown Rework
+////////////////////////
+function PlayerHurt(params)
 {
-	local player = null;
-	while ((player = Entities.FindByClassname(player, "player")) != null)
+	local player = GetPlayerFromUserID(params.userid);
+	local attacker = GetPlayerFromUserID(params.attacker);
+
+	if (player.IsValid())
 	{
-		if (player.IsValid())
+		// Non-tank infected hurt
+		if (player.GetZombieType() != 8)
 		{
-			if (player.IsSurvivor())
+			if ("type" in params)
 			{
-				ApplyShovePenalties(player);
-				UpdateShovePenalty(player);
+				// DMG_BULLET
+				if (params.type == 2)
+				{
+					NetProps.SetPropFloat(player, "m_flVelocityModifier", 1.0);
+
+					// Daroot Tank slowdown reverse engineered
+					local rangeMod = 1.0;
+					local distance = GetVectorDistance(attacker.GetOrigin(), player.GetOrigin())
+					local minRange = 200
+					local maxRange = 400
+					if (distance > maxRange) rangeMod = 0.0;
+					else if (distance > minRange) rangeMod = 1.0 - (distance - minRange) / (maxRange - minRange);
+
+					if (rangeMod > 0.0 && rangeMod <= 1.0) rangeMod = (1.0 - rangeMod) * 0.3 + 0.7;
+					if (rangeMod < NetProps.GetPropFloat(player, "m_flVelocityModifier")) NetProps.SetPropFloat(player, "m_flVelocityModifier", rangeMod);
+				}
 			}
 		}
 	}
 }
 
+////////////////////////
+// Shove Rework
+////////////////////////
+// Weapons now have unique "stamina" in regards to shoving
 function ApplyShovePenalties(player)
 {
 	local survivorID = GetSurvivorID(player);

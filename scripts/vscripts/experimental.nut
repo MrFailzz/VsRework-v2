@@ -1,6 +1,28 @@
 Msg("VERSUS++ Extras\n");
 
 /*
+// Reduce bonus when medkits used
+function OnGameEvent_heal_success(params)
+{
+	Convars.SetValue("vs_survival_bonus", survivorBonus - 2);
+	survivorBonus -= 2;
+
+	// Do not let survival bonus go below 0
+	if (Convars.GetFloat("vs_survival_bonus") < 0)
+		Convars.SetValue("vs_survival_bonus", 0);
+}
+
+// Reduce bonus when defibs used
+function OnGameEvent_defibrillator_used(params)
+{
+	Convars.SetValue("vs_survival_bonus", survivorBonus - 2);
+	survivorBonus -= 2;
+	
+	// Do not let survival bonus go below 0
+	if (Convars.GetFloat("vs_survival_bonus") < 0)
+		Convars.SetValue("vs_survival_bonus", 0);
+}
+
 // CS Molotov
 // Precache detonate snd
 if (!IsSoundPrecached("weapons/molotov/molotov_detonate_swt_01.wav"))
