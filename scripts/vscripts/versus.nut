@@ -122,26 +122,24 @@ function AllowTakeDamage(damageTable)
 		{
 			if (attacker.IsSurvivor())
 			{
-				// Modify autosniper DMG
-				if (weaponClass == "weapon_hunting_rifle" || weaponClass == "weapon_sniper_military")
+				//Attack Specific Variables
+				if (victim.IsValid())
 				{
-                    if (victimPlayer)
-                    {
-                        if (victim.GetZombieType() == 8)
-                        {
-                            damageDone = damageDone * sniperModifier;
-                        }
-                    }
+					victimPlayer = victim.IsPlayer();
+					victimType = victim.GetClassname();
 				}
-				// Modify smg headshot DMG
-				if (weaponClass == "weapon_smg_silenced")
+
+				if (victimPlayer)
 				{
-					if ((damageType & DMG_HEADSHOT) == DMG_HEADSHOT)
+					// Modify autosniper DMG
+                    if (weaponClass == "weapon_hunting_rifle" || weaponClass == "weapon_sniper_military")
+                    {
+                        if (victim.GetZombieType() == 8) damageDone = damageDone * sniperModifier;
+                    }
+					// Modify smg headshot DMG
+					if (weaponClass == "weapon_smg_silenced")
 					{
-						if (victimPlayer)
-						{
-							damageDone = damageDone * smgModifier;
-						}
+						if ((damageType & DMG_HEADSHOT) == DMG_HEADSHOT) damageDone = damageDone * smgModifier;
 					}
 				}
 			}
@@ -247,8 +245,5 @@ function UpdateShovePenalty(player)
 	local survivorID = GetSurvivorID(player);
 	local shovePenalty = NetProps.GetPropInt(player, "m_iShovePenalty");
 
-	if (shovePenalty < baseShovePenalty[survivorID])
-	{
-		NetProps.SetPropInt(player, "m_iShovePenalty", baseShovePenalty[survivorID]);
-	}
+	if (shovePenalty < baseShovePenalty[survivorID]) NetProps.SetPropInt(player, "m_iShovePenalty", baseShovePenalty[survivorID]);
 }
