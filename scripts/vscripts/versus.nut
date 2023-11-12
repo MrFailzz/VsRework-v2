@@ -105,10 +105,7 @@ function AllowTakeDamage(damageTable)
 	local victimType = null;
 	local weapon = damageTable.Weapon;
 	local weaponClass = null;
-	if (weapon != null)
-	{
-		weaponClass = weapon.GetClassname();
-	}
+	if (weapon != null) weaponClass = weapon.GetClassname();
 	local damageType = damageTable.DamageType;
 
 	// Modifiers
@@ -269,4 +266,21 @@ function OnGameEvent_tank_spawn(params)
 
 	// Show instructor hint to prepare for the Tank
 	EntFire("env_tank_hint", "ShowHint")
+}
+
+////////////////////////
+// CS Sniper Zoom
+////////////////////////
+function OnGameEvent_weapon_zoom(params)
+{
+	local player = GetPlayerFromUserID(params.userid);
+	local weapon = player.GetActiveWeapon();
+	local weaponClass = null;
+	if (weapon != null) weaponClass = weapon.GetClassname();
+
+	if (weaponClass == "weapon_sniper_awp" || weaponClass == "weapon_sniper_scout")
+	{
+		if (NetProps.GetPropInt(player, "m_iFOVStart") == 90) NetProps.SetPropInt(player, "m_iFOV", 30);
+		if (NetProps.GetPropInt(player, "m_iFOVStart") == 30) NetProps.SetPropInt(player, "m_iFOV", 0);
+	}
 }
