@@ -25,7 +25,7 @@ Convars.SetValue("z_witch_wander_personal_time", 7);
 Convars.SetValue("upgrade_laser_sight_spread_factor", 0.67);
 Convars.SetValue("z_gun_swing_vs_min_penalty", 5);
 Convars.SetValue("z_gun_swing_vs_max_penalty", 7);
-Convars.SetValue("ammo_minigun_max", 60);
+Convars.SetValue("ammo_minigun_max", 30);
 
 ////////////////////////
 // Stock functions
@@ -167,6 +167,7 @@ function PlayerHurt(params)
 					NetProps.SetPropFloat(player, "m_flVelocityModifier", 1.0);
 
 					// Daroot Tank slowdown reverse engineered
+					/*
 					local rangeMod = 1.0;
 					local distance = GetVectorDistance(attacker.GetOrigin(), player.GetOrigin())
 					local minRange = 200
@@ -176,6 +177,7 @@ function PlayerHurt(params)
 
 					if (rangeMod > 0.0 && rangeMod <= 1.0) rangeMod = (1.0 - rangeMod) * 0.3 + 0.7;
 					if (rangeMod < NetProps.GetPropFloat(player, "m_flVelocityModifier")) NetProps.SetPropFloat(player, "m_flVelocityModifier", rangeMod);
+					*/
 				}
 			}
 		}
@@ -289,4 +291,40 @@ function OnGameEvent_weapon_zoom(params)
 		if (NetProps.GetPropInt(player, "m_iFOVStart") == 45) NetProps.SetPropInt(player, "m_iFOV", 25);
 		if (NetProps.GetPropInt(player, "m_iFOVStart") == 25) NetProps.SetPropInt(player, "m_iFOV", 0);
 	}
+}
+
+////////////////////////
+// AWP T3 Spawn
+////////////////////////
+function OnGameEvent_round_start(params)
+{
+	local weapon_awp = null;
+	local weapon_launcher = null;
+
+	// Remove AWP spawns
+	while(weapon_awp = Entities.FindByModel(weapon_awp, "models/w_models/weapons/w_sniper_awp.mdl")) weapon_awp.Kill();          
+
+	// Replace grenade launcher with AWP
+	while(weapon_launcher = Entities.FindByModel(weapon_launcher, "models/w_models/weapons/w_grenade_launcher.mdl"))
+    {
+		local weapon_originX = weapon_launcher.GetOrigin().x;
+        local weapon_originY = weapon_launcher.GetOrigin().y;
+	    local weapon_originZ = weapon_launcher.GetOrigin().z;
+	    local weapon_angleX = weapon_launcher.GetAngles().x;
+	    local weapon_angleY = weapon_launcher.GetAngles().y;
+	    local weaponName = "AWP_spawn";
+
+		// Remove Grenade Launcher spawns
+		weapon_launcher.Kill();
+
+	    local weaponSpawn = SpawnEntityFromTable("weapon_sniper_awp",
+	    {
+		    targetname = weaponName,
+		    origin = Vector(weapon_originX, weapon_originY, weapon_originZ),
+		    angles = Vector(weapon_angleX, weapon_angleY, 0)
+		    solid = 0,
+		    disableshadows = 1,
+            ammo = 30,
+	    });         
+    }
 }
