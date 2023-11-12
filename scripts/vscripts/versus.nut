@@ -261,7 +261,7 @@ function OnGameEvent_tank_spawn(params)
 		hint_binding = "",
 		hint_forcecaption = 1,
 		hint_color = "255 255 255",
-		hint_caption = "Be ready to fight the Tank"
+		hint_caption = "Get ready to fight the Tank!"
 	});
 
 	// Show instructor hint to prepare for the Tank
@@ -278,9 +278,15 @@ function OnGameEvent_weapon_zoom(params)
 	local weaponClass = null;
 	if (weapon != null) weaponClass = weapon.GetClassname();
 
-	if (weaponClass == "weapon_sniper_awp" || weaponClass == "weapon_sniper_scout")
+	if (weaponClass == "weapon_sniper_scout")
 	{
 		if (NetProps.GetPropInt(player, "m_iFOVStart") == 90) NetProps.SetPropInt(player, "m_iFOV", 30);
 		if (NetProps.GetPropInt(player, "m_iFOVStart") == 30) NetProps.SetPropInt(player, "m_iFOV", 0);
+	}
+	if (weaponClass == "weapon_sniper_awp")
+	{
+		if (NetProps.GetPropInt(player, "m_iFOVStart") == 90) NetProps.SetPropInt(player, "m_iFOV", 45);
+		if (NetProps.GetPropInt(player, "m_iFOVStart") == 45) NetProps.SetPropInt(player, "m_iFOV", 25);
+		if (NetProps.GetPropInt(player, "m_iFOVStart") == 25) NetProps.SetPropInt(player, "m_iFOV", 0);
 	}
 }
