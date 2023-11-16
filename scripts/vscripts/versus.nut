@@ -107,7 +107,7 @@ function AllowTakeDamage(damageTable)
 	local damageType = damageTable.DamageType;
 
 	// Modifiers
-	local sniperModifier = 0.90;
+	local sniperModifier = 0.85;
 	local smgModifier = 0.90625;
 
 	// Modify Attacker damage
