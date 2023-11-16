@@ -12,13 +12,11 @@ baseShovePenalty <- [0, 0, 0, 0];
 Convars.SetValue("z_hunter_limit", 1);
 Convars.SetValue("z_smoker_limit", 1);
 Convars.SetValue("z_pounce_damage_interrupt", 185);
-Convars.SetValue("z_max_stagger_duration", 4);
 Convars.SetValue("z_max_survivor_damage", 100);
-Convars.SetValue("z_jockey_control_variance", 0.35);
-//Convars.SetValue("z_jockey_control_min", 0.68);
-//Convars.SetValue("z_jockey_control_max", 0.68);
-Convars.SetValue("versus_tank_flow_team_variation", 0.00);
-Convars.SetValue("versus_witch_flow_team_variation", 0.00);
+Convars.SetValue("z_jockey_control_min", 0.68);
+Convars.SetValue("z_jockey_control_max", 0.68);
+Convars.SetValue("versus_tank_flow_team_variation", 0.0);
+Convars.SetValue("versus_witch_flow_team_variation", 0.0);
 Convars.SetValue("z_tank_damage_slow_min_range", -400);
 Convars.SetValue("z_witch_damage_per_kill_hit", 20);
 Convars.SetValue("z_witch_wander_personal_time", 7);
@@ -255,7 +253,7 @@ function OnGameEvent_tank_spawn(params)
 	{
 		targetname = "env_tank_hint",
 		hint_static = 1,
-		hint_timeout = 10,
+		hint_timeout = 7.5,
 		hint_range = 0,
 		hint_nooffscreen = 0,
 		hint_icon_onscreen = "zombie_team_tank",
