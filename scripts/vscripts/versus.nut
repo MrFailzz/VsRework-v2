@@ -80,8 +80,9 @@ function Update()
 			{
 				ApplyShovePenalties(player);
 				UpdateShovePenalty(player);
-				//UpdateScoring(player);
 			}
+
+			UpdateStuckwarp(player);
 		}
 	}
 }
@@ -242,6 +243,23 @@ function UpdateShovePenalty(player)
 	local shovePenalty = NetProps.GetPropInt(player, "m_iShovePenalty");
 
 	if (shovePenalty < baseShovePenalty[survivorID]) NetProps.SetPropInt(player, "m_iShovePenalty", baseShovePenalty[survivorID]);
+}
+
+////////////////////////
+// Improve Stuckwarp
+////////////////////////
+function UpdateStuckwarp(player)
+{
+	local survivorID = GetSurvivorID(player);
+	local stuckTime = NetProps.GetPropInt(player, "m_StuckLast");
+
+	if (stuckTime > 800)
+	{
+		local playerOrigin = player.GetOrigin();
+		local playerNav = NavMesh.GetNearestNavArea(playerOrigin, 128, true, true);
+
+		if (playerNav != null) player.SetOrigin(playerNav.GetCenter());
+	}
 }
 
 ////////////////////////
