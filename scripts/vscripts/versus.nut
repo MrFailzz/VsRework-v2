@@ -3,24 +3,26 @@ Msg("VERSUS++\n");
 ////////////////////////
 // Globals
 ////////////////////////
+firstTank <- false;
 baseShovePenalty <- [0, 0, 0, 0];
 
 ////////////////////////
 // CVAR tweaks 
 ////////////////////////
 // (gamemodes.txt)
-Convars.SetValue("z_hunter_limit", 1);
-Convars.SetValue("z_smoker_limit", 1);
-Convars.SetValue("z_pounce_damage_interrupt", 185);
-Convars.SetValue("z_max_survivor_damage", 100);
-Convars.SetValue("z_jockey_control_min", 0.68);
+Convars.SetValue("z_hunter_limit", 1);								// Normally set to 2 (presumably unintentionally?)
+Convars.SetValue("z_smoker_limit", 1);								// Normally set to 2 (presumably unintentionally?)
+Convars.SetValue("z_pounce_damage_interrupt", 185);					// Increases DMG needed to kill a hunter that is midair
+Convars.SetValue("z_max_survivor_damage", 100);						// Max amount of DMG points that can be given for hitting survivors
+Convars.SetValue("z_jockey_control_variance", 0)					// Removes randomized control between survivor and jockey
+Convars.SetValue("z_jockey_control_min", 0.68);						// Set jockey ride speed to be consistent
 Convars.SetValue("z_jockey_control_max", 0.68);
 Convars.SetValue("versus_tank_flow_team_variation", 0.0);
 Convars.SetValue("versus_witch_flow_team_variation", 0.0);
-Convars.SetValue("z_tank_damage_slow_min_range", -400);
-Convars.SetValue("z_witch_damage_per_kill_hit", 20);
-Convars.SetValue("z_witch_wander_personal_time", 7);
-Convars.SetValue("upgrade_laser_sight_spread_factor", 0.67);
+Convars.SetValue("z_tank_damage_slow_min_range", -400);				// Minimizes the effective slowdown curve against the Tank
+Convars.SetValue("z_witch_damage_per_kill_hit", 20);				// Increases Witch DMG vs incapped survivors
+Convars.SetValue("z_witch_wander_personal_time", 7);				// Increases standing Witch aggro time
+Convars.SetValue("upgrade_laser_sight_spread_factor", 0.67);		// Decreases accuracy buff from Laser upgrade
 Convars.SetValue("z_gun_swing_vs_min_penalty", 5);
 Convars.SetValue("z_gun_swing_vs_max_penalty", 7);
 Convars.SetValue("ammo_minigun_max", 30);
@@ -132,7 +134,7 @@ function AllowTakeDamage(damageTable)
                     {
                         if (victim.GetZombieType() == 8) damageDone = damageDone * sniperModifier;
                     }
-					// Modify smg headshot DMG
+					// Modify silenced smg headshot DMG
 					if (weaponClass == "weapon_smg_silenced")
 					{
 						if ((damageType & DMG_HEADSHOT) == DMG_HEADSHOT) damageDone = damageDone * smgModifier;
@@ -160,7 +162,7 @@ function PlayerHurt(params)
 		{
 			if ("type" in params)
 			{
-				// DMG_BULLET
+				// Remove slowdown when infected (not the Tank) are hit by DMG_BULLET
 				if (params.type == 2)
 				{
 					NetProps.SetPropFloat(player, "m_flVelocityModifier", 1.0);
@@ -253,12 +255,38 @@ function UpdateStuckwarp(player)
 	local survivorID = GetSurvivorID(player);
 	local stuckTime = NetProps.GetPropInt(player, "m_StuckLast");
 
+	// Check if player has been stuck for ~2s
 	if (stuckTime > 800)
 	{
 		local playerOrigin = player.GetOrigin();
-		local playerNav = NavMesh.GetNearestNavArea(playerOrigin, 128, true, true);
+		local playerNav = NavMesh.GetNearestNavArea(playerOrigin, 156, true, true);
 
-		if (playerNav != null) player.SetOrigin(playerNav.GetCenter());
+		// Check if nearby nav exists
+		if (playerNav != null)
+		{
+			local navOrigin = playerNav.GetCenter();
+			local eyeAngles = player.EyeAngles();
+			local traceStart = navOrigin;
+			local traceEnd = navOrigin + (eyeAngles.Up());
+
+			local traceTable =
+			{
+				start = navOrigin
+				end = traceEnd
+				ignore = player
+			};
+
+			// Check if there is enough room to stand on nearest nav
+			if (TraceLine(traceTable))
+			{
+				if (traceTable.hit)
+				{
+					local distance = GetVectorDistance(traceTable.pos, navOrigin);
+					if (distance <= 72) player.SetOrigin(navOrigin);
+				}
+			}
+		}
+
 	}
 }
 
@@ -267,23 +295,29 @@ function UpdateStuckwarp(player)
 ////////////////////////
 function OnGameEvent_tank_spawn(params)
 {
-	local env_tank_hint = SpawnEntityFromTable("env_instructor_hint",
+	if (firstTank)
 	{
-		targetname = "env_tank_hint",
-		hint_static = 1,
-		hint_timeout = 7.5,
-		hint_range = 0,
-		hint_nooffscreen = 0,
-		hint_icon_onscreen = "zombie_team_tank",
-		hint_icon_offscreen = "zombie_team_tank",
-		hint_binding = "",
-		hint_forcecaption = 1,
-		hint_color = "255 255 255",
-		hint_caption = "Get ready to fight the Tank!"
-	});
+		local env_tank_hint = SpawnEntityFromTable("env_instructor_hint",
+		{
+			targetname = "env_tank_hint",
+			hint_static = 1,
+			hint_timeout = 7.5,
+			hint_range = 0,
+			hint_nooffscreen = 0,
+			hint_icon_onscreen = "zombie_team_tank",
+			hint_icon_offscreen = "zombie_team_tank",
+			hint_binding = "",
+			hint_forcecaption = 1,
+			hint_color = "255 255 255",
+			hint_caption = "Get ready to fight the Tank!"
+		});
 
-	// Show instructor hint to prepare for the Tank
-	EntFire("env_tank_hint", "ShowHint")
+		// Show instructor hint to prepare for the Tank
+		EntFire("env_tank_hint", "ShowHint")
+
+		// Prevent it from firing every time the Tank passes
+		firstTank = true;
+	}
 }
 
 ////////////////////////
@@ -296,16 +330,11 @@ function OnGameEvent_weapon_zoom(params)
 	local weaponClass = null;
 	if (weapon != null) weaponClass = weapon.GetClassname();
 
-	if (weaponClass == "weapon_sniper_scout")
+	if (weaponClass == "weapon_sniper_scout" || weaponClass == "weapon_sniper_awp")
 	{
+		// Fix AWP and Scout having zoom FOV that is inconsistent with other L4D snipers
 		if (NetProps.GetPropInt(player, "m_iFOVStart") == 90) NetProps.SetPropInt(player, "m_iFOV", 30);
 		if (NetProps.GetPropInt(player, "m_iFOVStart") == 30) NetProps.SetPropInt(player, "m_iFOV", 0);
-	}
-	if (weaponClass == "weapon_sniper_awp")
-	{
-		if (NetProps.GetPropInt(player, "m_iFOVStart") == 90) NetProps.SetPropInt(player, "m_iFOV", 45);
-		if (NetProps.GetPropInt(player, "m_iFOVStart") == 45) NetProps.SetPropInt(player, "m_iFOV", 25);
-		if (NetProps.GetPropInt(player, "m_iFOVStart") == 25) NetProps.SetPropInt(player, "m_iFOV", 0);
 	}
 }
 
@@ -323,9 +352,7 @@ function OnGameEvent_round_start(params)
 	// Replace grenade launcher with AWP
 	while(weapon_launcher = Entities.FindByModel(weapon_launcher, "models/w_models/weapons/w_grenade_launcher.mdl"))
     {
-		local weapon_originX = weapon_launcher.GetOrigin().x;
-        local weapon_originY = weapon_launcher.GetOrigin().y;
-	    local weapon_originZ = weapon_launcher.GetOrigin().z;
+		local weapon_origin = weapon_launcher.GetOrigin();
 	    local weapon_angleX = weapon_launcher.GetAngles().x;
 	    local weapon_angleY = weapon_launcher.GetAngles().y;
 	    local weaponName = "AWP_spawn";
@@ -336,8 +363,8 @@ function OnGameEvent_round_start(params)
 	    local weaponSpawn = SpawnEntityFromTable("weapon_sniper_awp",
 	    {
 		    targetname = weaponName,
-		    origin = Vector(weapon_originX, weapon_originY, weapon_originZ),
-		    angles = Vector(weapon_angleX, weapon_angleY, 0)
+		    origin = weapon_origin,
+		    angles = Vector(weapon_angleX, weapon_angleY, 0),
 		    solid = 0,
 		    disableshadows = 1,
             ammo = 30,
