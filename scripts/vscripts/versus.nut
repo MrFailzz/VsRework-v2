@@ -3,7 +3,7 @@ Msg("VERSUS++\n");
 ////////////////////////
 // Globals
 ////////////////////////
-firstTank <- false;
+firstTank <- true;
 baseShovePenalty <- [0, 0, 0, 0];
 
 ////////////////////////
@@ -316,7 +316,7 @@ function OnGameEvent_tank_spawn(params)
 		EntFire("env_tank_hint", "ShowHint")
 
 		// Prevent it from firing every time the Tank passes
-		firstTank = true;
+		firstTank = false;
 	}
 }
 
