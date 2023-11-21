@@ -30,46 +30,10 @@ Convars.SetValue("ammo_minigun_max", 30);
 ////////////////////////
 // Stock functions
 ////////////////////////
-function GetSurvivorID(player)
-{
-	switch(player.GetModelName())
-	{
-		case "models/survivors/survivor_gambler.mdl":
-			return 0;
-			break;
-		case "models/survivors/survivor_producer.mdl":
-			return 1;
-			break;
-		case "models/survivors/survivor_coach.mdl":
-			return 2;
-			break;
-		case "models/survivors/survivor_mechanic.mdl":
-			return 3;
-			break;
-		case "models/survivors/survivor_namvet.mdl":
-			return 0;
-			break;
-		case "models/survivors/survivor_teenangst.mdl":
-			return 1;
-			break;
-		case "models/survivors/survivor_manager.mdl":
-			return 2;
-			break;
-		case "models/survivors/survivor_biker.mdl":
-			return 3;
-			break;
-		default:
-			return -1;
-			break;
-	}
-}
-::GetSurvivorID <- GetSurvivorID;
-
 function GetVectorDistance(vec1, vec2)
 {
 	return sqrt(pow(vec1.x - vec2.x,2) + pow(vec1.y - vec2.y,2) + pow(vec1.z - vec2.z,2));
 }
-::zGetVectorDistance <- GetVectorDistance;
 
 function Update()
 {
@@ -190,7 +154,7 @@ function PlayerHurt(params)
 ////////////////////////
 function ApplyShovePenalties(player)
 {
-	local survivorID = GetSurvivorID(player);
+	local survivorID = player.GetSurvivorSlot();
 	local weaponClass = "";
 	local weapon = player.GetActiveWeapon();
 	local shovePenalty = 0;
@@ -241,7 +205,7 @@ function ApplyShovePenalties(player)
 
 function UpdateShovePenalty(player)
 {
-	local survivorID = GetSurvivorID(player);
+	local survivorID = player.GetSurvivorSlot();
 	local shovePenalty = NetProps.GetPropInt(player, "m_iShovePenalty");
 
 	if (shovePenalty < baseShovePenalty[survivorID]) NetProps.SetPropInt(player, "m_iShovePenalty", baseShovePenalty[survivorID]);
@@ -252,19 +216,19 @@ function UpdateShovePenalty(player)
 ////////////////////////
 function UpdateStuckwarp(player)
 {
-	local survivorID = GetSurvivorID(player);
 	local stuckTime = NetProps.GetPropInt(player, "m_StuckLast");
 
 	// Check if player has been stuck for ~2s
 	if (stuckTime > 800)
 	{
 		local playerOrigin = player.GetOrigin();
-		local playerNav = NavMesh.GetNearestNavArea(playerOrigin, 156, true, true);
+		local navTable = {};
+		local playerNav = NavMesh.GetNavAreasInRadius(playerOrigin, 128 navTable)
 
 		// Check if nearby nav exists
-		if (playerNav != null)
+		foreach(area in navTable)
 		{
-			local navOrigin = playerNav.GetCenter();
+			local navOrigin = area.GetCenter();
 			local eyeAngles = player.EyeAngles();
 			local traceStart = navOrigin;
 			local traceEnd = navOrigin + (eyeAngles.Up());
@@ -286,7 +250,6 @@ function UpdateStuckwarp(player)
 				}
 			}
 		}
-
 	}
 }
 
@@ -313,7 +276,7 @@ function OnGameEvent_tank_spawn(params)
 		});
 
 		// Show instructor hint to prepare for the Tank
-		EntFire("env_tank_hint", "ShowHint")
+		EntFire("env_tank_hint", "ShowHint");
 
 		// Prevent it from firing every time the Tank passes
 		firstTank = false;
