@@ -223,30 +223,30 @@ function UpdateStuckwarp(player)
 	{
 		local playerOrigin = player.GetOrigin();
 		local navTable = {};
-		local playerNav = NavMesh.GetNavAreasInRadius(playerOrigin, 128 navTable)
+		local playerNav = NavMesh.GetNavAreasInRadius(playerOrigin, 128, navTable)
 
 		// Check if nearby nav exists
 		foreach(area in navTable)
 		{
 			local navOrigin = area.GetCenter();
-			local eyeAngles = player.EyeAngles();
 			local traceStart = navOrigin;
-			local traceEnd = navOrigin + (eyeAngles.Up());
+			local traceEnd = Vector(navOrigin.x, navOrigin.y, navOrigin.z + 9999);
 
 			local traceTable =
 			{
 				start = navOrigin
 				end = traceEnd
+				mask = TRACE_MASK_VISION
 				ignore = player
 			};
 
-			// Check if there is enough room to stand on nearest nav
+			// Check if enough headroom for player
 			if (TraceLine(traceTable))
 			{
 				if (traceTable.hit)
 				{
-					local distance = GetVectorDistance(traceTable.pos, navOrigin);
-					if (distance <= 72) player.SetOrigin(navOrigin);
+					local distance = GetVectorDistance(navOrigin, traceTable.pos);
+					if (distance >= 72) player.SetOrigin(navOrigin);
 				}
 			}
 		}
