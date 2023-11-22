@@ -223,7 +223,7 @@ function UpdateStuckwarp(player)
 	{
 		local playerOrigin = player.GetOrigin();
 		local navTable = {};
-		local playerNav = NavMesh.GetNavAreasInRadius(playerOrigin, 128, navTable)
+		local playerNav = NavMesh.GetNavAreasInRadius(playerOrigin, 192, navTable)
 
 		// Check if nearby nav exists
 		foreach(area in navTable)
@@ -239,14 +239,19 @@ function UpdateStuckwarp(player)
 				mask = TRACE_MASK_VISION
 				ignore = player
 			};
-
-			// Check if enough headroom for player
-			if (TraceLine(traceTable))
+			local traceTableLOS =
 			{
-				if (traceTable.hit)
+				start = navOrigin
+				end = Vector(playerOrigin.x, playerOrigin.y, playerOrigin.z + 48)
+				mask = TRACE_MASK_VISION
+			};
+
+			if (TraceLine(traceTable) && TraceLine(traceTableLOS))
+			{
+				if (traceTable.hit && traceTableLOS.hit)
 				{
 					local distance = GetVectorDistance(navOrigin, traceTable.pos);
-					if (distance >= 72) player.SetOrigin(navOrigin);
+					if (distance >= 72 && traceTableLOS.enthit == player) player.SetOrigin(navOrigin);
 				}
 			}
 		}
@@ -272,7 +277,7 @@ function OnGameEvent_tank_spawn(params)
 			hint_binding = "",
 			hint_forcecaption = 1,
 			hint_color = "255 255 255",
-			hint_caption = "Get ready to fight the Tank!"
+			hint_caption = "Get ready to fight the Tank"
 		});
 
 		// Show instructor hint to prepare for the Tank
