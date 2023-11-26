@@ -277,7 +277,7 @@ function OnGameEvent_tank_spawn(params)
 			hint_binding = "",
 			hint_forcecaption = 1,
 			hint_color = "255 255 255",
-			hint_caption = "Get ready to fight the Tank"
+			hint_caption = "Get ready to fight the Tank!"
 		});
 
 		// Show instructor hint to prepare for the Tank
