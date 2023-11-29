@@ -64,8 +64,7 @@ WeaponData
 
 	"Damage"			"215"
 	"Range"				"8192"
-	"RangeModifier"			"0.99"
-	"GainRange"			"1500"	// range at which to use a gain curve to fall off to zero
+	"RangeModifier"			"1.0"
 	"Bullets"			"1"
 	"CycleTime"			"1.05"
 	"AccuracyDivisor"		"-1"

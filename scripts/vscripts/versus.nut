@@ -63,19 +63,20 @@ function AllowTakeDamage(damageTable)
 	local originalDamageDone = damageTable.DamageDone;
 	local attacker = damageTable.Attacker;
 	local victim = damageTable.Victim;
-	local attackerPlayer = null;
-	local attackerClass = null;
-	local attackerType = null;
 	local victimPlayer = null;
 	local victimType = null;
 	local weapon = damageTable.Weapon;
 	local weaponClass = null;
 	if (weapon != null) weaponClass = weapon.GetClassname();
 	local damageType = damageTable.DamageType;
+	local distance = null;
+	local rangeMod = null;
 
 	// Modifiers
-	local sniperModifier = 0.85;
-	local smgModifier = 0.90625;
+	local sniperRangeMod = 0.97;
+	local sniperTankMod = 0.875;
+	local ak47TankMod = 0.935;
+	local smgHeadMod = 0.90625;
 
 	// Modify Attacker damage
 	if (attacker.IsValid())
@@ -89,19 +90,27 @@ function AllowTakeDamage(damageTable)
 				{
 					victimPlayer = victim.IsPlayer();
 					victimType = victim.GetClassname();
+					distance = GetVectorDistance(attacker.GetOrigin(), victim.GetOrigin());
 				}
 
 				if (victimPlayer)
 				{
-					// Modify autosniper DMG
-                    if (weaponClass == "weapon_hunting_rifle" || weaponClass == "weapon_sniper_military")
-                    {
-                        if (victim.GetZombieType() == 8) damageDone = damageDone * sniperModifier;
-                    }
-					// Modify silenced smg headshot DMG
-					if (weaponClass == "weapon_smg_silenced")
+					switch(weaponClass)
 					{
-						if ((damageType & DMG_HEADSHOT) == DMG_HEADSHOT) damageDone = damageDone * smgModifier;
+						case "weapon_smg_silenced":
+							if ((damageType & DMG_HEADSHOT) == DMG_HEADSHOT) damageDone = damageDone * smgHeadMod;
+						break;
+						case "weapon_rifle_ak47":
+							if (victim.GetZombieType() == 8) damageDone = damageDone * ak47TankMod;
+							else damageDone = damageDone * rangeMod;
+						break;
+						case "weapon_hunting_rifle":
+						case "weapon_sniper_military":
+							rangeMod = pow(sniperRangeMod, distance / 500);
+
+                       	 	if (victim.GetZombieType() == 8) damageDone = damageDone * rangeMod * sniperTankMod;
+							else damageDone = damageDone * rangeMod;
+						break;
 					}
 				}
 			}
@@ -168,8 +177,7 @@ function ApplyShovePenalties(player)
 			switch(weaponClass)
 			{
 				case "weapon_pistol_magnum":
-				case "weapon_smg":
-				case "weapon_smg_silenced":
+				case "weapon_smg*":
 					shovePenalty += 1;
 				break;
 				case "weapon_melee":
@@ -232,7 +240,7 @@ function UpdateStuckwarp(player)
 			local traceStart = navOrigin;
 			local traceEnd = Vector(navOrigin.x, navOrigin.y, navOrigin.z + 9999);
 
-			local traceTable =
+			local traceTableHeight =
 			{
 				start = navOrigin
 				end = traceEnd
@@ -246,11 +254,11 @@ function UpdateStuckwarp(player)
 				mask = TRACE_MASK_VISION
 			};
 
-			if (TraceLine(traceTable) && TraceLine(traceTableLOS))
+			if (TraceLine(traceTableHeight) && TraceLine(traceTableLOS))
 			{
-				if (traceTable.hit && traceTableLOS.hit)
+				if (traceTableHeight.hit && traceTableLOS.hit)
 				{
-					local distance = GetVectorDistance(navOrigin, traceTable.pos);
+					local distance = GetVectorDistance(navOrigin, traceTableHeight.pos);
 					if (distance >= 72 && traceTableLOS.enthit == player) player.SetOrigin(navOrigin);
 				}
 			}
