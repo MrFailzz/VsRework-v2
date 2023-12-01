@@ -6,8 +6,8 @@ DirectorOptions <-
 	ProhibitBosses = false
 	
 	//LockTempo = true
-	MobSpawnMinTime = 8
-	MobSpawnMaxTime = 8
+	MobSpawnMinTime = 5
+	MobSpawnMaxTime = 5
 	MobMinSize = 30
 	MobMaxSize = 30
 	MobMaxPending = 30
@@ -33,10 +33,10 @@ DirectorOptions <-
 		// Decrease mob sizes the longer the event goes on with a min cap  
 	    local Time = Time();
 
-		if (Time - lastTime >= 5 && MobMinSize > 20) lastTime = Time, MobMinSize -= 2;
-		if (Time - lastTime >= 20 && MobMinSize <= 20), MobMinSize -= 1;
+		if (MobMinSize > 20) lastTime = Time, MobMinSize -= 1;
+		if (Time - lastTime >= 10 && MobMinSize <= 20) MobMinSize -= 2;
 
-	    if (MobMinSize <= 10) MobMinSize = 10;
+	    if (MobMinSize <= 10) MobMinSize = 10, MobSpawnMinTime = 12, MobSpawnMaxTime = 12;
 	}
 }
 

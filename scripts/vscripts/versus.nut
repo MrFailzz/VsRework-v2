@@ -22,7 +22,7 @@ Convars.SetValue("versus_witch_flow_team_variation", 0.0);
 Convars.SetValue("z_tank_damage_slow_min_range", -400);				// Minimizes the effective slowdown curve against the Tank
 Convars.SetValue("z_witch_damage_per_kill_hit", 20);				// Increases Witch DMG vs incapped survivors
 Convars.SetValue("z_witch_wander_personal_time", 7);				// Increases standing Witch aggro time
-Convars.SetValue("upgrade_laser_sight_spread_factor", 0.67);		// Decreases accuracy buff from Laser upgrade
+//Convars.SetValue("upgrade_laser_sight_spread_factor", 0.67);		// Decreases accuracy buff from Laser upgrade
 Convars.SetValue("z_gun_swing_vs_min_penalty", 5);
 Convars.SetValue("z_gun_swing_vs_max_penalty", 7);
 Convars.SetValue("ammo_minigun_max", 30);
@@ -138,20 +138,13 @@ function PlayerHurt(params)
 				// Remove slowdown when infected (not the Tank) are hit by DMG_BULLET
 				if (params.type == 2)
 				{
-					NetProps.SetPropFloat(player, "m_flVelocityModifier", 1.0);
+					local distance = GetVectorDistance(attacker.GetOrigin(), player.GetOrigin());
+					local newVelMod = pow(0.85, distance / 500);
+					local oldVelMod = NetProps.GetPropFloat(player, "m_flVelocityModifier");
 
-					// Daroot Tank slowdown reverse engineered
-					/*
-					local rangeMod = 1.0;
-					local distance = GetVectorDistance(attacker.GetOrigin(), player.GetOrigin())
-					local minRange = 200
-					local maxRange = 400
-					if (distance > maxRange) rangeMod = 0.0;
-					else if (distance > minRange) rangeMod = 1.0 - (distance - minRange) / (maxRange - minRange);
-
-					if (rangeMod > 0.0 && rangeMod <= 1.0) rangeMod = (1.0 - rangeMod) * 0.3 + 0.7;
-					if (rangeMod < NetProps.GetPropFloat(player, "m_flVelocityModifier")) NetProps.SetPropFloat(player, "m_flVelocityModifier", rangeMod);
-					*/
+					if (distance < 500 && oldVelMod != newVelMod) NetProps.SetPropFloat(player, "m_flVelocityModifier", newVelMod);
+					else NetProps.SetPropFloat(player, "m_flVelocityModifier", 1.0);
+					//NetProps.SetPropFloat(player, "m_flVelocityModifier", 1.0);
 				}
 			}
 		}
@@ -227,23 +220,22 @@ function UpdateStuckwarp(player)
 	local stuckTime = NetProps.GetPropInt(player, "m_StuckLast");
 
 	// Check if player has been stuck for ~2s
-	if (stuckTime > 800)
+	if (stuckTime >= 800)
 	{
 		local playerOrigin = player.GetOrigin();
 		local navTable = {};
-		local playerNav = NavMesh.GetNavAreasInRadius(playerOrigin, 192, navTable)
+		local playerNav = NavMesh.GetNavAreasInRadius(playerOrigin, 192, navTable);
+	    local closestNav = null;
+        local closestDistance = null;
 
 		// Check if nearby nav exists
 		foreach(area in navTable)
 		{
 			local navOrigin = area.GetCenter();
-			local traceStart = navOrigin;
-			local traceEnd = Vector(navOrigin.x, navOrigin.y, navOrigin.z + 9999);
-
 			local traceTableHeight =
 			{
 				start = navOrigin
-				end = traceEnd
+				end = Vector(navOrigin.x, navOrigin.y, navOrigin.z + 9999);
 				mask = TRACE_MASK_VISION
 				ignore = player
 			};
@@ -254,15 +246,29 @@ function UpdateStuckwarp(player)
 				mask = TRACE_MASK_VISION
 			};
 
+			// Check for player headroom (72 units?) and LOS
 			if (TraceLine(traceTableHeight) && TraceLine(traceTableLOS))
 			{
 				if (traceTableHeight.hit && traceTableLOS.hit)
 				{
-					local distance = GetVectorDistance(navOrigin, traceTableHeight.pos);
-					if (distance >= 72 && traceTableLOS.enthit == player) player.SetOrigin(navOrigin);
+					local distanceLOS = GetVectorDistance(navOrigin, traceTableLOS.pos);
+					local distanceHeight = GetVectorDistance(navOrigin, traceTableHeight.pos);
+
+					if (distanceHeight >= 72 && traceTableLOS.enthit == player)
+					{
+						// Check if nav is closer than the previous
+						if ( closestDistance == null || distanceLOS < closestDistance)
+						{
+							closestDistance = distanceLOS;
+							closestNav = navOrigin;
+						}
+					}
 				}
 			}
 		}
+
+		// Warp player to nearest nav that meets headroom and LOS reqs
+        if (closestNav != null) player.SetOrigin(closestNav);
 	}
 }
 
@@ -291,9 +297,17 @@ function OnGameEvent_tank_spawn(params)
 		// Show instructor hint to prepare for the Tank
 		EntFire("env_tank_hint", "ShowHint");
 
-		// Prevent it from firing every time the Tank passes
+		// Prevent hint from firing again until tank is killed
 		firstTank = false;
 	}
+}
+
+function OnGameEvent_tank_killed(params)
+{
+	// If tank dies and no other tanks are active set firstTank
+	// to false so the hint can fire again later
+	if (!Director.IsTankInPlay()) firstTank = true;
+	else firstTank = false;
 }
 
 ////////////////////////
