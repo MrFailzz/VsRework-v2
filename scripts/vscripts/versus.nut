@@ -14,7 +14,7 @@ Convars.SetValue("z_hunter_limit", 1);								// Normally set to 2 (presumably u
 Convars.SetValue("z_smoker_limit", 1);								// Normally set to 2 (presumably unintentionally?)
 Convars.SetValue("z_pounce_damage_interrupt", 185);					// Increases DMG needed to kill a hunter that is midair
 Convars.SetValue("z_max_survivor_damage", 100);						// Max amount of DMG points that can be given for hitting survivors
-Convars.SetValue("z_jockey_control_variance", 0)					// Removes randomized control between survivor and jockey
+Convars.SetValue("z_jockey_control_variance", 0);					// Removes randomized control between survivor and jockey
 Convars.SetValue("z_jockey_control_min", 0.68);						// Set jockey ride speed to be consistent
 Convars.SetValue("z_jockey_control_max", 0.68);
 Convars.SetValue("versus_tank_flow_team_variation", 0.0);
@@ -67,7 +67,8 @@ function AllowTakeDamage(damageTable)
 	local victimType = null;
 	local weapon = damageTable.Weapon;
 	local weaponClass = null;
-	if (weapon != null) weaponClass = weapon.GetClassname();
+	if (weapon != null) 
+		weaponClass = weapon.GetClassname();
 	local damageType = damageTable.DamageType;
 	local distance = null;
 	local rangeMod = null;
@@ -98,18 +99,21 @@ function AllowTakeDamage(damageTable)
 					switch(weaponClass)
 					{
 						case "weapon_smg_silenced":
-							if ((damageType & DMG_HEADSHOT) == DMG_HEADSHOT) damageDone = damageDone * smgHeadMod;
+							if ((damageType & DMG_HEADSHOT) == DMG_HEADSHOT) 
+								damageDone = damageDone * smgHeadMod;
 						break;
 						case "weapon_rifle_ak47":
-							if (victim.GetZombieType() == 8) damageDone = damageDone * ak47TankMod;
-							else damageDone = damageDone * rangeMod;
+							if (victim.GetZombieType() == 8) 
+								damageDone = damageDone * ak47TankMod;
 						break;
 						case "weapon_hunting_rifle":
 						case "weapon_sniper_military":
 							rangeMod = pow(sniperRangeMod, distance / 500);
 
-                       	 	if (victim.GetZombieType() == 8) damageDone = damageDone * rangeMod * sniperTankMod;
-							else damageDone = damageDone * rangeMod;
+                       	 	if (victim.GetZombieType() == 8) 
+								damageDone = damageDone * rangeMod * sniperTankMod;
+							else 
+								damageDone = damageDone * rangeMod;
 						break;
 					}
 				}
@@ -139,12 +143,13 @@ function PlayerHurt(params)
 				if (params.type == 2)
 				{
 					local distance = GetVectorDistance(attacker.GetOrigin(), player.GetOrigin());
-					local newVelMod = pow(0.85, distance / 500);
 					local oldVelMod = NetProps.GetPropFloat(player, "m_flVelocityModifier");
+					local newVelMod = pow(0.85, distance / 500);
 
-					if (distance < 500 && oldVelMod != newVelMod) NetProps.SetPropFloat(player, "m_flVelocityModifier", newVelMod);
-					else NetProps.SetPropFloat(player, "m_flVelocityModifier", 1.0);
-					//NetProps.SetPropFloat(player, "m_flVelocityModifier", 1.0);
+					if (distance < 500 && oldVelMod != newVelMod) 
+						NetProps.SetPropFloat(player, "m_flVelocityModifier", newVelMod);
+					else 
+						NetProps.SetPropFloat(player, "m_flVelocityModifier", 1.0);
 				}
 			}
 		}
@@ -157,8 +162,8 @@ function PlayerHurt(params)
 function ApplyShovePenalties(player)
 {
 	local survivorID = player.GetSurvivorSlot();
-	local weaponClass = "";
 	local weapon = player.GetActiveWeapon();
+	local weaponClass = "";
 	local shovePenalty = 0;
 
 	if (weapon != null)
@@ -209,7 +214,8 @@ function UpdateShovePenalty(player)
 	local survivorID = player.GetSurvivorSlot();
 	local shovePenalty = NetProps.GetPropInt(player, "m_iShovePenalty");
 
-	if (shovePenalty < baseShovePenalty[survivorID]) NetProps.SetPropInt(player, "m_iShovePenalty", baseShovePenalty[survivorID]);
+	if (shovePenalty < baseShovePenalty[survivorID]) 
+		NetProps.SetPropInt(player, "m_iShovePenalty", baseShovePenalty[survivorID]);
 }
 
 ////////////////////////
@@ -228,14 +234,14 @@ function UpdateStuckwarp(player)
 	    local closestNav = null;
         local closestDistance = null;
 
-		// Check if nearby nav exists
+		// Check if nearby navs exist
 		foreach(area in navTable)
 		{
 			local navOrigin = area.GetCenter();
 			local traceTableHeight =
 			{
 				start = navOrigin
-				end = Vector(navOrigin.x, navOrigin.y, navOrigin.z + 9999);
+				end = Vector(navOrigin.x, navOrigin.y, navOrigin.z + 9999)
 				mask = TRACE_MASK_VISION
 				ignore = player
 			};
@@ -246,7 +252,8 @@ function UpdateStuckwarp(player)
 				mask = TRACE_MASK_VISION
 			};
 
-			// Check for player headroom (72 units?) and LOS
+			// Check for player headroom and LOS
+			// 72 units player height, but check for 92 units to be safe
 			if (TraceLine(traceTableHeight) && TraceLine(traceTableLOS))
 			{
 				if (traceTableHeight.hit && traceTableLOS.hit)
@@ -254,10 +261,10 @@ function UpdateStuckwarp(player)
 					local distanceLOS = GetVectorDistance(navOrigin, traceTableLOS.pos);
 					local distanceHeight = GetVectorDistance(navOrigin, traceTableHeight.pos);
 
-					if (distanceHeight >= 72 && traceTableLOS.enthit == player)
+					if (distanceHeight >= 92 && traceTableLOS.enthit == player)
 					{
 						// Check if nav is closer than the previous
-						if ( closestDistance == null || distanceLOS < closestDistance)
+						if (closestDistance == null || distanceLOS < closestDistance)
 						{
 							closestDistance = distanceLOS;
 							closestNav = navOrigin;
@@ -268,7 +275,9 @@ function UpdateStuckwarp(player)
 		}
 
 		// Warp player to nearest nav that meets headroom and LOS reqs
-        if (closestNav != null) player.SetOrigin(closestNav);
+		// Increase z axis by 8 to ensure players do not get stuck in displacements
+        if (closestNav != null)
+			player.SetOrigin(Vector(closestNav.x, closestNav.y, closestNav.z + 8));
 	}
 }
 
@@ -306,8 +315,10 @@ function OnGameEvent_tank_killed(params)
 {
 	// If tank dies and no other tanks are active set firstTank
 	// to false so the hint can fire again later
-	if (!Director.IsTankInPlay()) firstTank = true;
-	else firstTank = false;
+	if (!Director.IsTankInPlay()) 
+		firstTank = true;
+	else 
+		firstTank = false;
 }
 
 ////////////////////////
@@ -318,7 +329,8 @@ function OnGameEvent_weapon_zoom(params)
 	local player = GetPlayerFromUserID(params.userid);
 	local weapon = player.GetActiveWeapon();
 	local weaponClass = null;
-	if (weapon != null) weaponClass = weapon.GetClassname();
+	if (weapon != null) 
+		weaponClass = weapon.GetClassname();
 
 	if (weaponClass == "weapon_sniper_scout" || weaponClass == "weapon_sniper_awp")
 	{
@@ -337,7 +349,8 @@ function OnGameEvent_round_start(params)
 	local weapon_launcher = null;
 
 	// Remove AWP spawns
-	while(weapon_awp = Entities.FindByModel(weapon_awp, "models/w_models/weapons/w_sniper_awp.mdl")) weapon_awp.Kill();          
+	while(weapon_awp = Entities.FindByModel(weapon_awp, "models/w_models/weapons/w_sniper_awp.mdl")) 
+		weapon_awp.Kill();          
 
 	// Replace grenade launcher with AWP
 	while(weapon_launcher = Entities.FindByModel(weapon_launcher, "models/w_models/weapons/w_grenade_launcher.mdl"))

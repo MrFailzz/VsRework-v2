@@ -22,13 +22,28 @@ DirectorOptions <-
 
 	function RecalculateLimits()
 	{
-		// Decrease mob sizes the longer the event goes on with a min cap  
-	    local Time = Time();
+		// Decrease mob sizes as the event goes on, and then cycle it back to default settings 
+	    local currentTime = Time();
 
-		if (Time - lastTime >= 5 && MobMinSize > 20) lastTime = Time, MobMinSize -= 1;
-		if (Time - lastTime >= 15 && MobMinSize <= 20) MobMinSize -= 1;
-
-	    if (MobMinSize <= 10) MobMinSize = 10;
+		if (MobMinSize > 20)
+		{
+			MobMinSize -= 1;
+			lastTime = currentTime;
+		}	
+		else if (MobMinSize > 10 && currentTime - lastTime >= 15) 
+		{
+			MobMinSize = 10;
+			MobSpawnMinTime = 12;
+			MobSpawnMaxTime = 12;
+			lastTime = currentTime;
+		}
+		else if (MobMinSize <= 10 && currentTime - lastTime >= 25)
+		{
+			MobMinSize = 25;
+			MobSpawnMinTime = 8;
+			MobSpawnMaxTime = 8;
+			lastTime = currentTime;
+		}
 	}
 }
 
