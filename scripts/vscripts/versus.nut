@@ -4,7 +4,6 @@ Msg("VERSUS++\n");
 // Globals
 ////////////////////////
 firstTank <- true;
-baseShovePenalty <- [0, 0, 0, 0];
 
 ////////////////////////
 // CVAR tweaks 
@@ -23,8 +22,6 @@ Convars.SetValue("z_jockey_control_variance", 0);					// Removes randomized cont
 Convars.SetValue("z_jockey_control_min", 0.68);						// Set jockey ride speed to be consistent
 Convars.SetValue("z_jockey_control_max", 0.68);
 Convars.SetValue("z_max_survivor_damage", 100);						// Max amount of DMG points that can be given for hitting survivors
-Convars.SetValue("z_gun_swing_vs_min_penalty", 5);
-Convars.SetValue("z_gun_swing_vs_max_penalty", 7);
 Convars.SetValue("ammo_minigun_max", 30);
 
 ////////////////////////
@@ -37,19 +34,9 @@ function GetVectorDistance( vec1, vec2 )
 
 function Update()
 {
-	local player = null;
-	while ( ( player = Entities.FindByClassname( player, "player" ) ) != null )
+	for ( local player; ( player = Entities.FindByClassname( player, "player" ) ) != null; ) 
 	{
-		if ( player.IsValid() )
-		{
-			if ( player.IsSurvivor() )
-			{
-				ApplyShovePenalties(player);
-				UpdateShovePenalty(player);
-			}
-
-			UpdateStuckwarp( player );
-		}
+		if ( player.IsValid() ) { UpdateStuckwarp( player ); } 
 	}
 }
 
@@ -73,6 +60,7 @@ function AllowTakeDamage( damageTable )
 	local rangeMod = null;
 
 	// Modifiers
+	local sniperBaseDmg = 80;
 	local sniperRangeMod = 0.97;
 	local sniperTankMod = 0.875;
 	local ak47TankMod = 0.935;
@@ -103,7 +91,7 @@ function AllowTakeDamage( damageTable )
 						case "weapon_sniper_military":
 							rangeMod = pow( sniperRangeMod, distance / 500 );
 
-                       	 	if ( victim.GetZombieType() == 8 ) { damageDone = damageDone * rangeMod * sniperTankMod; }
+                       	 	if ( victim.GetZombieType() == 8 ) { damageDone = sniperBaseDmg * rangeMod * sniperTankMod; }
 							else { damageDone = damageDone * rangeMod; }
 						break;
 					}
@@ -123,144 +111,67 @@ function PlayerHurt( params )
 {
 	local player = GetPlayerFromUserID( params.userid );
 	local attacker = GetPlayerFromUserID( params.attacker );
-
-	if ( player.IsValid() )
+	if ( player.IsValid() ) 
 	{
-		if ( player.GetZombieType() != 8 )
-		{
-			if ( "type" in params )
+		if ( player.GetZombieType() != 8 ) 
+		{ 
+			if ( "type" in params ) 
 			{
 				// Remove slowdown when infected (not the Tank) are hit by DMG_BULLET
-				if ( params.type == 2 )
+				if ( params.type == 2 ) 
 				{
 					local distance = GetVectorDistance( attacker.GetOrigin(), player.GetOrigin() );
 					local oldVelMod = NetProps.GetPropFloat( player, "m_flVelocityModifier" );
-					local newVelMod = pow( 0.85, distance / 500 );
-
+					local newVelMod = pow( 0.9, distance / 500 );
 					if ( distance < 500 && oldVelMod != newVelMod ) { NetProps.SetPropFloat(player, "m_flVelocityModifier", newVelMod); }
-					else { NetProps.SetPropFloat( player, "m_flVelocityModifier", 1.0 ); }
-				}
-			}
-		}
+					else { NetProps.SetPropFloat( player, "m_flVelocityModifier", 1.0 ); } 
+				} 
+			} 
+		} 
 	}
-}
-
-////////////////////////
-// Shove Rework
-////////////////////////
-function ApplyShovePenalties(player)
-{
-	local survivorID = player.GetSurvivorSlot();
-	local weapon = player.GetActiveWeapon();
-	local weaponClass = "";
-	local shovePenalty = 0;
-
-	if (weapon != null)
-	{
-		if (weapon.IsValid())
-		{
-			weaponClass = weapon.GetClassname();
-
-			switch(weaponClass)
-			{
-				case "weapon_pistol_magnum":
-				case "weapon_smg*":
-					shovePenalty += 1;
-				break;
-				case "weapon_melee":
-				case "weapon_shotgun_chrome":
-				case "weapon_pumpshotgun":
-				case "weapon_sniper_scout":
-				case "weapon_rifle":
-				case "weapon_rifle_sg552":
-				case "weapon_rifle_desert":
-					shovePenalty += 2;
-				break;
-
-				case "weapon_rifle_ak47":
-				case "weapon_hunting_rifle":
-					shovePenalty += 3;
-				break;
-				case "weapon_autoshotgun":
-				case "weapon_shotgun_spas":
-				case "weapon_sniper_military":
-				case "weapon_sniper_awp":
-					shovePenalty += 4;
-				break;
-				default:
-					shovePenalty = 0;
-				break;
-			}
-		}
-	}
-
-	// Weapons now have unique "stamina" in regards to shoving
-	baseShovePenalty[survivorID] = shovePenalty;
-}
-
-function UpdateShovePenalty(player)
-{
-	local survivorID = player.GetSurvivorSlot();
-	local shovePenalty = NetProps.GetPropInt(player, "m_iShovePenalty");
-
-	if (shovePenalty < baseShovePenalty[survivorID]) { NetProps.SetPropInt(player, "m_iShovePenalty", baseShovePenalty[survivorID]); }
 }
 
 ////////////////////////
 // Improve Stuckwarp
 ////////////////////////
-function UpdateStuckwarp( player )
+function UpdateStuckwarp( player ) 
 {
-	local stuckTime = NetProps.GetPropInt( player, "m_StuckLast" );
-
 	// Check if player has been stuck for ~2s
-	if ( stuckTime >= 800 )
+	local stuckTime = NetProps.GetPropInt( player, "m_StuckLast" );
+	if ( stuckTime < 800 ) { return }
+	local playerOrigin = player.GetOrigin();
+	local navTable = {};
+	local closestNav = null;
+    local closestDistance = null;
+	NavMesh.GetNavAreasInRadius( playerOrigin, 192, navTable );
+
+	// Check if nearby navs exist
+	foreach ( area in navTable ) 
 	{
-		local playerOrigin = player.GetOrigin();
-		local navTable = {};
-	    local closestNav = null;
-        local closestDistance = null;
-		NavMesh.GetNavAreasInRadius( playerOrigin, 192, navTable );
-
-		// Check if nearby navs exist
-		foreach ( area in navTable )
+		local navOrigin = area.GetCenter();
+		local traceTableHeight = 
 		{
-			local navOrigin = area.GetCenter();
-			local traceTableHeight =
-			{
-				start = navOrigin
-				end = Vector( navOrigin.x, navOrigin.y, navOrigin.z + 9999 )
-				mask = TRACE_MASK_VISION
-				ignore = player
-			};
+			start = navOrigin
+			end = navOrigin + Vector( 0, 0, 92 )
+			mask = TRACE_MASK_VISION
+			ignore = player 
+		};
 
-			// Check for player headroom and LOS
-			// 72 units player height, but check for 92 units to be safe
-			// Areas with displacements can be finnicky but these values have worked well
-			if ( TraceLine( traceTableHeight ) )
-			{
-				if ( traceTableHeight.hit )
-				{
-					local distanceLOS = GetVectorDistance( navOrigin, playerOrigin );
-					local distanceHeight = GetVectorDistance( navOrigin, traceTableHeight.pos );
-
-					if ( distanceHeight >= 92 && area.IsVisible( Vector( playerOrigin.x, playerOrigin.y, playerOrigin.z + 48 ) ) )
-					{
-						// Check if current nav is closer than the previously checked nav
-						if ( closestDistance == null || distanceLOS < closestDistance )
-						{
-							closestDistance = distanceLOS;
-							closestNav = navOrigin;
-						}
-					}
-				}
-			}
+		// Check for player headroom and LOS
+		// 72 units player height, but check for 92 units to be safe
+		// Areas with displacements can be finnicky but these values have worked well
+		if ( !TraceLine( traceTableHeight ) ) { continue }
+		local distanceLOS = ( navOrigin - playerOrigin ).Length(); 
+		local distanceHeight = ( navOrigin - traceTableHeight.pos ).Length();
+		if ( distanceHeight == 92 && area.IsVisible( playerOrigin + Vector( 0, 0 , 48 ) ) ) 
+		{
+			// Check if current nav is closer than the previously checked nav
+			if ( closestDistance == null || distanceLOS < closestDistance ) { closestDistance = distanceLOS; closestNav = navOrigin; } 
 		}
-
-		// Warp player to nearest nav that meets headroom and LOS reqs
-		// Increase z axis by 8 to ensure players do not get stuck in displacements
-        if ( closestNav != null ) { player.SetOrigin( Vector( closestNav.x, closestNav.y, closestNav.z + 8 ) ); }
 	}
+	// Warp player to nearest nav that meets headroom and LOS reqs
+	// Increase z axis by 8 to ensure players do not get stuck in displacements
+    if ( closestNav != null ) { player.SetOrigin( Vector( closestNav.x, closestNav.y, closestNav.z + 8 ) ); } 
 }
 
 ////////////////////////
@@ -268,9 +179,9 @@ function UpdateStuckwarp( player )
 ////////////////////////
 function OnGameEvent_tank_spawn( params )
 {
-	if ( firstTank )
+	if ( firstTank ) 
 	{
-		local env_tank_hint = SpawnEntityFromTable( "env_instructor_hint",
+		local env_tank_hint = SpawnEntityFromTable( "env_instructor_hint", 
 		{
 			targetname = "env_tank_hint",
 			hint_static = 1,
@@ -282,23 +193,18 @@ function OnGameEvent_tank_spawn( params )
 			hint_binding = "",
 			hint_forcecaption = 1,
 			hint_color = "255 255 255",
-			hint_caption = "Get ready to fight the Tank!"
+			hint_caption = "Get ready to fight the Tank!" 
 		} );
-
 		// Show instructor hint to prepare for the Tank
-		EntFire( "env_tank_hint", "ShowHint" );
-
 		// Prevent hint from firing again until tank is killed
-		firstTank = false;
+		EntFire( "env_tank_hint", "ShowHint" ); firstTank = false; 
 	}
 }
 
 function OnGameEvent_tank_killed( params )
 {
-	// If tank dies and no other tanks are active set firstTank
-	// to false so the hint can fire again later
-	if ( !Director.IsTankInPlay() ) { firstTank = true; }
-	else  { firstTank = false; }
+	// If tank dies set firstTank to false so the hint can fire again
+	firstTank = true;
 }
 
 ////////////////////////
@@ -309,14 +215,13 @@ function OnGameEvent_weapon_zoom( params )
 	local player = GetPlayerFromUserID(params.userid);
 	local weapon = player.GetActiveWeapon();
 	local weaponClass = null;
-	if ( weapon != null ) 
-		weaponClass = weapon.GetClassname();
+	if ( weapon != null ) { weaponClass = weapon.GetClassname(); }
 
-	if ( weaponClass == "weapon_sniper_scout" || weaponClass == "weapon_sniper_awp" )
+	if ( weaponClass == "weapon_sniper_scout" || weaponClass == "weapon_sniper_awp" ) 
 	{
 		// Fix AWP and Scout having zoom FOV that is inconsistent with other L4D snipers
 		if ( NetProps.GetPropInt( player, "m_iFOVStart" ) == 90) { NetProps.SetPropInt(player, "m_iFOV", 30); }
-		if ( NetProps.GetPropInt( player, "m_iFOVStart" ) == 30) { NetProps.SetPropInt(player, "m_iFOV", 0); }
+		if ( NetProps.GetPropInt( player, "m_iFOVStart" ) == 30) { NetProps.SetPropInt(player, "m_iFOV", 0); } 
 	}
 }
 
