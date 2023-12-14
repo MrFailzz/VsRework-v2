@@ -13,12 +13,12 @@ Convars.SetValue("z_hunter_limit", 1);								// Normally set to 2 (presumably u
 Convars.SetValue("z_smoker_limit", 1);								// Normally set to 2 (presumably unintentionally?)
 Convars.SetValue("versus_tank_flow_team_variation", 0.0);
 Convars.SetValue("versus_witch_flow_team_variation", 0.0);
-Convars.SetValue("z_tank_damage_slow_min_range", -400);				// Minimizes the effective slowdown curve against the Tank
+Convars.SetValue("z_tank_damage_slow_min_range", -200);				// Minimizes the effective slowdown curve against the Tank
 Convars.SetValue("z_witch_damage_per_kill_hit", 20);				// Increases Witch DMG vs incapped survivors
 Convars.SetValue("z_witch_wander_personal_time", 7);				// Increases standing Witch aggro time
 //Convars.SetValue("upgrade_laser_sight_spread_factor", 0.67);		// Decreases accuracy buff from Laser upgrade
 //Convars.SetValue("z_pounce_damage_interrupt", 185);					// Increases DMG needed to kill a hunter that is midair
-Convars.SetValue("z_jockey_control_variance", 0);					// Removes randomized control between survivor and jockey
+Convars.SetValue("z_jockey_control_variance", 0.0);					// Removes randomized control between survivor and jockey
 Convars.SetValue("z_jockey_control_min", 0.68);						// Set jockey ride speed to be consistent
 Convars.SetValue("z_jockey_control_max", 0.68);
 Convars.SetValue("z_max_survivor_damage", 100);						// Max amount of DMG points that can be given for hitting survivors
@@ -27,11 +27,6 @@ Convars.SetValue("ammo_minigun_max", 30);
 ////////////////////////
 // Stock functions
 ////////////////////////
-function GetVectorDistance( vec1, vec2 )
-{
-	return sqrt( pow(vec1.x - vec2.x,2 ) + pow( vec1.y - vec2.y,2 ) + pow( vec1.z - vec2.z,2 ) );
-}
-
 function Update()
 {
 	for ( local player; ( player = Entities.FindByClassname( player, "player" ) ) != null; ) 
@@ -57,49 +52,47 @@ function AllowTakeDamage( damageTable )
 	if ( weapon != null ) { weaponClass = weapon.GetClassname(); }
 	local damageType = damageTable.DamageType;
 	local distance = null;
-	local rangeMod = null;
 
 	// Modifiers
-	local sniperBaseDmg = 80;
-	local sniperRangeMod = 0.97;
-	local sniperTankMod = 0.875;
-	local ak47TankMod = 0.935;
+	local rangeMod = 1;
+	local tankMod = 1;
 
 	// Modify Attacker damage
 	if ( attacker.IsValid() )
 	{
 		if ( attacker.IsPlayer() )
 		{
-			if ( attacker.IsSurvivor() )
+			if ( !attacker.IsSurvivor() ) { return }
+
+			//Attack Specific Variables
+			if ( victim.IsValid() )
 			{
-				//Attack Specific Variables
-				if ( victim.IsValid() )
+				victimPlayer = victim.IsPlayer();
+				victimType = victim.GetClassname();
+				distance = ( attacker.GetOrigin(), victim.GetOrigin() ).Length();
+			}
+
+			if ( victimPlayer )
+			{
+				switch( weaponClass )
 				{
-					victimPlayer = victim.IsPlayer();
-					victimType = victim.GetClassname();
-					distance = GetVectorDistance( attacker.GetOrigin(), victim.GetOrigin() );
+					case "weapon_rifle_ak47":
+						rangeMod = 1;
+						tankMod = 0.935;
+					break;
+					case "weapon_hunting_rifle":
+					case "weapon_sniper_military":
+						rangeMod = pow( 0.97, distance / 500 );
+						tankMod = 0.875;
+					break;
 				}
 
-				if ( victimPlayer )
-				{
-					switch( weaponClass )
-					{
-						case "weapon_rifle_ak47":
-							if ( victim.GetZombieType() == 8 ) { damageDone = damageDone * ak47TankMod; }
-						break;
-						case "weapon_hunting_rifle":
-						case "weapon_sniper_military":
-							rangeMod = pow( sniperRangeMod, distance / 500 );
-
-                       	 	if ( victim.GetZombieType() == 8 ) { damageDone = sniperBaseDmg * rangeMod * sniperTankMod; }
-							else { damageDone = damageDone * rangeMod; }
-						break;
-					}
-				}
+				if ( victim.GetZombieType() == 8 ) { damageDone = damageDone * rangeMod * tankMod; }
+				else { damageDone = damageDone * rangeMod; }
 			}
 		}
 	}
-	
+
 	damageTable.DamageDone = damageDone;
 	return true;
 }
@@ -120,9 +113,9 @@ function PlayerHurt( params )
 				// Remove slowdown when infected (not the Tank) are hit by DMG_BULLET
 				if ( params.type == 2 ) 
 				{
-					local distance = GetVectorDistance( attacker.GetOrigin(), player.GetOrigin() );
+					local distance = ( attacker.GetOrigin(), player.GetOrigin() ).Length();
 					local oldVelMod = NetProps.GetPropFloat( player, "m_flVelocityModifier" );
-					local newVelMod = pow( 0.9, distance / 500 );
+					local newVelMod = pow( 0.85, distance / 500 );
 					if ( distance < 500 && oldVelMod != newVelMod ) { NetProps.SetPropFloat(player, "m_flVelocityModifier", newVelMod); }
 					else { NetProps.SetPropFloat( player, "m_flVelocityModifier", 1.0 ); } 
 				} 
@@ -171,7 +164,7 @@ function UpdateStuckwarp( player )
 	}
 	// Warp player to nearest nav that meets headroom and LOS reqs
 	// Increase z axis by 8 to ensure players do not get stuck in displacements
-    if ( closestNav != null ) { player.SetOrigin( Vector( closestNav.x, closestNav.y, closestNav.z + 8 ) ); } 
+    if ( closestNav != null ) { player.SetOrigin( closestNav + Vector( 0, 0, 8) ); } 
 }
 
 ////////////////////////
@@ -197,7 +190,8 @@ function OnGameEvent_tank_spawn( params )
 		} );
 		// Show instructor hint to prepare for the Tank
 		// Prevent hint from firing again until tank is killed
-		EntFire( "env_tank_hint", "ShowHint" ); firstTank = false; 
+		EntFire( "env_tank_hint", "ShowHint" ); 
+		firstTank = false; 
 	}
 }
 
