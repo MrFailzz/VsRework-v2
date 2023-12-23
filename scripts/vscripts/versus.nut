@@ -145,7 +145,7 @@ function UpdateStuckwarp( player )
 		local traceTableHeight = 
 		{
 			start = navOrigin
-			end = navOrigin + Vector( 0, 0, 92 )
+			end = navOrigin + Vector( 0, 0, 112 )
 			mask = TRACE_MASK_VISION
 			ignore = player 
 		};
@@ -156,7 +156,7 @@ function UpdateStuckwarp( player )
 		if ( !TraceLine( traceTableHeight ) ) { continue }
 		local distanceLOS = ( navOrigin - playerOrigin ).Length(); 
 		local distanceHeight = ( navOrigin - traceTableHeight.pos ).Length();
-		if ( distanceHeight == 92 && area.IsVisible( playerOrigin + Vector( 0, 0 , 48 ) ) ) 
+		if ( distanceHeight >= 92 && area.IsVisible( playerOrigin + Vector( 0, 0, 48 ) ) ) 
 		{
 			// Check if current nav is closer than the previously checked nav
 			if ( closestDistance == null || distanceLOS < closestDistance ) { closestDistance = distanceLOS; closestNav = navOrigin; } 
