@@ -16,5 +16,6 @@ Convars.SetValue("z_jockey_control_max", 0.68);
 Convars.SetValue("z_spit_interval", 15);
 Convars.SetValue("z_vomit_interval", 12);
 //Convars.SetValue("z_jockey_speed", 260);
-Convars.SetValue("versus_shove_hunter_fov_pouncing", 25);
-Convars.SetValue("versus_shove_jockey_fov_leaping", 25);
+//Convars.SetValue("versus_shove_hunter_fov_pouncing", 25);
+//Convars.SetValue("versus_shove_jockey_fov_leaping", 25);
+Convars.SetValue("vs_tiebreak_bonus", 20 + (Director.GetMapNumber() * 5));      // Scale tiebreaker amount with distance points
