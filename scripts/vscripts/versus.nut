@@ -5,6 +5,7 @@ IncludeScript("versus/damagetweaks");
 IncludeScript("versus/molotovtweaks");
 IncludeScript("versus/stuckwarpfix");
 IncludeScript("versus/tankannounce");
+IncludeScript("versus/falltweaks");
 IncludeScript("versus/misctweaks");
 
 ////////////////////////
@@ -16,7 +17,7 @@ function Update()
 	{
 		if (player.IsValid())
 		{
-			UpdateStuckwarp(player)
+			UpdateStuckwarp(player);
 		}
 	}
 }
@@ -39,4 +40,9 @@ function OnGameEvent_molotov_thrown(params)
 function OnGameEvent_weapon_zoom(params)
 {
 	SniperScopeFix(params);
+}
+
+function OnGameEvent_player_hurt_concise(params)
+{
+	NoDefibOnFalling(params);
 }

@@ -25,7 +25,7 @@ function AllowTakeDamage(damageTable)
 	{
 		if (attacker.IsPlayer())
 		{
-			if (!attacker.IsSurvivor()) {return true}
+			//if (!attacker.IsSurvivor()) {return true}
 
 			//Attack Specific Variables
 			if (victim.IsValid())
