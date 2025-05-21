@@ -4,7 +4,7 @@ DirectorOptions <-
 {
 	// This turns off tanks and witches.
 	ProhibitBosses = false
-	
+
 	//LockTempo = true
 	MobSpawnMinTime = 3
 	MobSpawnMaxTime = 3
@@ -26,32 +26,29 @@ DirectorOptions <-
 	PreferredMobDirection = SPAWN_IN_FRONT_OF_SURVIVORS
 	ZombieSpawnRange = 2000
 
-	lastTime = 0
+	cooldownTimer = 25
 
 	function RecalculateLimits()
 	{
-		// Decrease mob sizes as the event goes on, and then cycle it back to default settings 
-	    local currentTime = Time();
-
+		// Decrease mob sizes as the event goes on, and then cycle it back to default settings
 		if (MobMinSize > 17)
 		{
 			MobMinSize -= 1;
-			lastTime = currentTime;
-		}	
-		else if (MobMinSize > 10 && currentTime - lastTime >= 20) 
+		}
+		else if (MobMinSize > 10 && cooldownTimer <= 0)
 		{
 			MobMinSize = 10;
-			MobSpawnMinTime = 8;
 			MobSpawnMaxTime = 8;
-			lastTime = currentTime;
+			cooldownTimer = 15;
 		}
-		else if (MobMinSize <= 10 && currentTime - lastTime >= 15)
+		else if (MobMinSize <= 10 && cooldownTimer <= 0)
 		{
 			MobMinSize = 30;
-			MobSpawnMinTime = 5;
 			MobSpawnMaxTime = 5;
-			lastTime = currentTime;
+			cooldownTimer = 15;
 		}
+
+		cooldownTimer--;
 	}
 }
 

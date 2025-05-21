@@ -12,7 +12,7 @@ DirectorOptions <-
 	MobMaxPending = 11
 	SustainPeakMinTime = 1
 	SustainPeakMaxTime = 3
-	IntensityRelaxThreshold = 0.80
+	IntensityRelaxThreshold = 0.90
 	RelaxMinInterval = 4
 	RelaxMaxInterval = 8
 	RelaxMaxFlowTravel = 200
