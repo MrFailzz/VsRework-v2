@@ -1,7 +1,7 @@
 Msg("VERSUS++\n");
 
 IncludeScript("versus/cvartweaks");
-IncludeScript("versus/damagetweaks");
+IncludeScript("versus/weapontweaks");
 IncludeScript("versus/molotovtweaks");
 IncludeScript("versus/stuckwarpfix");
 IncludeScript("versus/tankannounce");
@@ -45,4 +45,9 @@ function OnGameEvent_weapon_zoom(params)
 function OnGameEvent_player_hurt_concise(params)
 {
 	NoDefibOnFalling(params);
+}
+
+function OnGameEvent_weapon_reload(params)
+{
+	WeaponReload(params);
 }

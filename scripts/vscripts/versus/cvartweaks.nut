@@ -9,6 +9,7 @@ Convars.SetValue("z_tank_damage_slow_min_range", -200);				// Minimizes the effe
 Convars.SetValue("z_witch_damage_per_kill_hit", 20);				// Increases Witch DMG vs incapped survivors
 Convars.SetValue("z_witch_wander_personal_time", 7);				// Increases standing Witch aggro time
 Convars.SetValue("upgrade_laser_sight_spread_factor", 0.67);		// Decreases accuracy buff from Laser upgrade
+Convars.SetValue("adrenaline_run_speed", 240);						// Lower adrenaline player move speed
 Convars.SetValue("z_pounce_damage_interrupt", 185);					// Increases DMG needed to kill a hunter that is midair
 Convars.SetValue("z_jockey_control_variance", 0.0);					// Removes randomized control between survivor and jockey
 Convars.SetValue("z_jockey_control_min", 0.68);						// Set jockey ride speed to be consistent
