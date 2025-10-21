@@ -19,6 +19,13 @@ function AllowTakeDamage(damageTable)
 	// Modifiers
 	local rangeMod = 1;
 	local adrenMod = 1;
+	local rangeModRegular = 1;
+	local rangeModSniper = 1;
+
+	// Weapon variables
+	local distToMinDmg = 1500;
+	local distToStartLoseDmg = 500;
+	local maxDist = 8192;
 
 	// Modify Attacker damage
 	if (attacker.IsValid())
@@ -39,19 +46,28 @@ function AllowTakeDamage(damageTable)
 				{
 					case "weapon_hunting_rifle":
 						damageDone = 80;
-						rangeMod = pow(0.98, distance / 500);
-						if (distance > 8192) {damageDone = 0}
+						rangeMod = 0.97;
 					break;
 					case "weapon_sniper_military":
-						damageDone = 65;
-						rangeMod = pow(0.97, distance / 500);
-						if (distance > 8192) {damageDone = 0}
+						damageDone = 80;
+						rangeMod = 0.95;
 					break;
 					case "weapon_smg":
-						rangeMod = pow(0.89, distance / 500);
-						if (distance > 2500) {damageDone = 0}
+						rangeMod = 0.89;
+						maxDist = 2500;
+					break;
+					case "weapon_pistol_magnum":
+						rangeMod = 0.85;
+						maxDist = 3500;
 					break;
 				}
+
+				// Max distance before bullets do no damage
+				if (distance > maxDist) {damageDone = 0}
+
+				// Damage dropoff equations for weapons. Snipers have separate equation (not used currently)
+				rangeModRegular = pow(rangeMod, distance / distToStartLoseDmg);
+				//rangeModSniper = Clamp(0.5 + (1 - 0.5) * (distToMinDmg - distance) / (distToMinDmg - distToStartLoseDmg), 0.5, 1);
 
 				// Halve damage when adrenaline is active
 				if (victim.IsAdrenalineActive())
@@ -60,7 +76,8 @@ function AllowTakeDamage(damageTable)
 					if (originalDamageDone >= 10) {NetProps.SetPropInt(victim, "m_bAdrenalineActive", 0)}
 				}
 
-				damageDone = damageDone * rangeMod * adrenMod;
+				// Final damage calculations
+				damageDone = damageDone * rangeModRegular * adrenMod;
 			}
 		}
 	}
@@ -88,6 +105,9 @@ function WeaponReload(params)
 
 				switch(weaponClass)
 				{
+					case "weapon_sniper_military":
+						reloadModifier = 0.9;
+					break;
 					case "weapon_rifle_ak47":
 						reloadModifier = 0.9;
 					break;
@@ -111,3 +131,45 @@ function WeaponReload(params)
 		}
 	}
 }
+
+/*
+function WeaponFirerate(params)
+{
+	local player = GetPlayerFromUserID(params["userid"]);
+
+	if (player != null)
+	{
+		if (player.IsPlayer())
+		{
+			if (player.IsSurvivor())
+			{
+				local weapon = player.GetActiveWeapon();
+				local weaponClass = weapon.GetClassname();
+				local weaponClassExclude =
+				[
+					"weapon_molotov",
+					"weapon_pipe_bomb",
+					"weapon_vomitjar",
+				];
+				if (weaponClass in weaponClassExclude) {return}
+				local weaponSequence = weapon.GetSequence();
+				local baseFirerate = weapon.GetSequenceDuration(weaponSequence);
+				local firerateModifier = GetFirerateModifier(player);
+
+				switch(weaponClass)
+				{
+				}
+
+				local newFirerate = baseFirerate / firerateModifier;
+				local oldNextAttack = NetProps.GetPropFloat(weapon, "m_flNextPrimaryAttack");
+				local newNextAttack = oldNextAttack - baseFirerate + newFirerate;
+				local playbackRate = baseFirerate / newFirerate;
+
+				NetProps.SetPropFloat(weapon, "m_flNextPrimaryAttack", newNextAttack);
+				NetProps.SetPropFloat(player, "m_flNextAttack", newNextAttack);
+				NetProps.SetPropFloat(weapon, "m_flPlaybackRate", playbackRate);
+			}
+		}
+	}
+}
+*/

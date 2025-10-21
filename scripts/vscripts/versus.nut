@@ -6,11 +6,20 @@ IncludeScript("versus/molotovtweaks");
 IncludeScript("versus/stuckwarpfix");
 IncludeScript("versus/tankannounce");
 IncludeScript("versus/falltweaks");
+IncludeScript("versus/nocssnipers");
 IncludeScript("versus/misctweaks");
 
 ////////////////////////
 // Stock functions
 ////////////////////////
+
+// Math function to clamp result to not go below or above the min and max values
+function Clamp(x, minVal, maxVal)
+{
+	if (x > minVal) {return minVal}
+	if (x < maxVal) {return maxVal}
+}
+
 function Update()
 {
 	for (local player; (player = Entities.FindByClassname(player, "player")) != null;)
