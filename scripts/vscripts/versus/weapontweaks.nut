@@ -18,7 +18,6 @@ function AllowTakeDamage(damageTable)
 
 	// Modifiers
 	local rangeMod = 1;
-	local adrenMod = 1;
 	local rangeModRegular = 1;
 	local rangeModSniper = 1;
 
@@ -50,7 +49,7 @@ function AllowTakeDamage(damageTable)
 					break;
 					case "weapon_sniper_military":
 						damageDone = 80;
-						rangeMod = 0.95;
+						rangeMod = 0.94;
 					break;
 					case "weapon_smg":
 						rangeMod = 0.89;
@@ -69,15 +68,8 @@ function AllowTakeDamage(damageTable)
 				rangeModRegular = pow(rangeMod, distance / distToStartLoseDmg);
 				//rangeModSniper = Clamp(0.5 + (1 - 0.5) * (distToMinDmg - distance) / (distToMinDmg - distToStartLoseDmg), 0.5, 1);
 
-				// Halve damage when adrenaline is active
-				if (victim.IsAdrenalineActive())
-				{
-					adrenMod = 0.67
-					if (originalDamageDone >= 10) {NetProps.SetPropInt(victim, "m_bAdrenalineActive", 0)}
-				}
-
 				// Final damage calculations
-				damageDone = damageDone * rangeModRegular * adrenMod;
+				damageDone = damageDone * rangeModRegular;
 			}
 		}
 	}
