@@ -27,8 +27,18 @@ function Update()
 		if (player.IsValid())
 		{
 			UpdateStuckwarp(player);
+			UpdateTankHint();
 		}
 	}
+}
+
+////////////////////////
+// Game events
+////////////////////////
+
+function OnGameEvent_round_start(params)
+{
+	TankHintSpawn(params);
 }
 
 function OnGameEvent_tank_spawn(params)
